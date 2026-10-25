@@ -21,10 +21,29 @@ no changes to the packaged application, no rebuild.
 
 ## Install
 
+The package is both a client plugin and a DSH **bundle** (`dsh.bundle.patch`), so
+it can be installed manually or from a plugin market index.
+
+### From the DSH plugin market (Discover)
+
+Market index:
+
+```
+https://raw.githubusercontent.com/mkfeyman/dsh-turkish-locale/main/market-index.json
+```
+
+Add that URL as an index source in **Plugins → More → Discover** (Settings →
+Plugins also lists the configured sources), then install "Türkçe dil paketi".
+The installer pins
+`git+https://github.com/mkfeyman/dsh-turkish-locale#<commit>`, so **Git** must be
+available to pnpm on the machine.
+
+### Manual install
+
 1. Copy this package into a DSH profile's `node_modules`:
 
    ```powershell
-   Copy-Item -Recurse dsh-turkish-locale "$HOME\.dsh\profiles\desktop\node_modules\"
+   Copy-Item -Recurse dsh-turkish-locale "$HOME\\.dsh\\profiles\\desktop\\node_modules\\"
    ```
 
 2. Add rows to the profile's `cordis.patch.yml`:
@@ -47,9 +66,11 @@ no changes to the packaged application, no rebuild.
 |---|---|
 | `lib/client.js` | Browser bundle registering the language and dictionaries |
 | `lib/index.js` | Empty host half (Loader row) |
+| `cordis.patch.yml` | Bundle patch: adds the `tr-locale` row and defaults the locale to `tr` |
 | `locales/tr.json` | Full namespace → key → Turkish dictionary data |
+| `market-index.json` | Plugin market index listing this bundle (format 1) |
 | `locale/` | Package-localized title/description |
-| `docs/` | Screenshots |
+| `docs/` | Screenshots and market icon |
 
 ## Provenance
 
