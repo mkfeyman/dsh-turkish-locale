@@ -1,0 +1,10 @@
+# Turkish (Türkçe) language pack: mounts the client plugin that registers the
+# tr locale and its dictionaries, then selects Turkish as the default Web
+# interface language. Choose another language again in Settings > General >
+# Language; that write replaces the preference below.
+- insert:
+    - id: tr-locale
+      name: dsh-turkish-locale
+- id: locale
+  config:
+    preference: tr
