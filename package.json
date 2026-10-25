@@ -29,5 +29,17 @@
       ]
     }
   },
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "i18n",
+    "localization",
+    "turkish"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mkfeyman/dsh-turkish-locale.git"
+  },
+  "homepage": "https://github.com/mkfeyman/dsh-turkish-locale"
 }
