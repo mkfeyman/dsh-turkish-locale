@@ -2,9 +2,11 @@
   "name": "dsh-turkish-locale",
   "version": "1.0.0",
   "description": "Turkish (tr) language pack for the DeepSeek Harness web interface",
-  "private": true,
   "type": "module",
   "main": "lib/index.js",
+  "engines": {
+    "dsh": ">=0.2.1-rc.3 <0.3.0"
+  },
   "exports": {
     ".": {
       "default": "./lib/index.js"
@@ -13,13 +15,16 @@
       "default": "./lib/client.js"
     },
     "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml",
     "./locale/*.json": "./locale/*.json"
   },
   "files": [
     "lib/index.js",
     "lib/client.js",
+    "cordis.patch.yml",
     "locale/*.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "dsh": {
     "client": {
@@ -27,6 +32,9 @@
       "inject": [
         "@deepseek-ai/dsh-client-locale"
       ]
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
     }
   },
   "license": "MIT",
