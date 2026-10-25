@@ -1,0 +1,77 @@
+{
+  "format": 1,
+  "title": {
+    "en": "dsh-turkish-locale",
+    "tr": "Türkçe dil paketi"
+  },
+  "description": {
+    "en": "Community Turkish (Türkçe) language pack for the DeepSeek Harness Web UI.",
+    "tr": "DeepSeek Harness Web arayüzü için topluluk Türkçe dil paketi."
+  },
+  "metadata": {
+    "categories": {
+      "language": {
+        "title": {
+          "en": "Language packs",
+          "tr": "Dil paketleri"
+        }
+      }
+    },
+    "labels": {
+      "community": {
+        "title": {
+          "en": "Community",
+          "tr": "Topluluk"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-turkish-locale",
+      "title": {
+        "en": "Turkish (tr) language pack",
+        "tr": "Türkçe dil paketi"
+      },
+      "description": {
+        "en": "Adds Turkish to Settings → General → Language: 64 namespaces / 2,910 strings, 100% of the shipped English UI copy.",
+        "tr": "Ayarlar → Genel → Dil altına Türkçe ekler: 64 ad alanı / 2.910 dizgi, gönderilen İngilizce arayüzün tamamı."
+      },
+      "icon": "docs/icon.png",
+      "author": "mkfeyman",
+      "homepage": "https://github.com/mkfeyman/dsh-turkish-locale",
+      "repository": {
+        "url": "https://github.com/mkfeyman/dsh-turkish-locale"
+      },
+      "metadata": {
+        "category": "language",
+        "labels": [
+          "community"
+        ],
+        "keywords": [
+          "turkish",
+          "i18n",
+          "localization",
+          "locale"
+        ]
+      },
+      "dist-tags": {
+        "latest": "1.0.0"
+      },
+      "versions": [
+        {
+          "version": "1.0.0",
+          "publishTimestamp": 1792950020,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/mkfeyman/dsh-turkish-locale",
+            "commit": "4536962ee24de4820e9d7f40a73ee77cea812bbe"
+          },
+          "engines": {
+            "dsh": ">=0.2.1-rc.3 <0.3.0"
+          }
+        }
+      ]
+    }
+  ]
+}
