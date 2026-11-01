@@ -520,6 +520,15 @@
    }
  
    /** Snapshot the catalog in registration order. */
+@@ -464,7 +587,7 @@
+   }
+ 
+   private translate(ns: string, key: string, params?: Record<string, unknown>): string {
+-    const chain = this.fallbackChain(this.snapshot.active)
++    const chain = this.lookupChain()
+     const template = this.lookup(ns, key, chain)
+       ?? (ns !== COMMON_NS ? this.lookup(COMMON_NS, key, chain) : undefined)
+       ?? key
 @@ -496,6 +619,7 @@
    ): void {
      this.snapshot = Object.freeze({
