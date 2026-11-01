@@ -91,6 +91,11 @@ preference list (`ru → en → zh`) is supported by this pack. We published:
 - **Fixture** to exercise it: [`fixtures/`](fixtures/README.md) — a 59.4 %
   Turkish subset (1728 / 2910 keys) plus `expected-behavior.json` samples for
   `["tr","en"]`, `["en","tr"]`, `["tr","zh"]` and the legacy single selection.
+- **Live demo:** the fixture was installed as a temporary `tr-partial` language
+  pack and selected in Settings → General → Language, rendering a mixed
+  Turkish/English UI (screenshot below). The demo pack was removed afterwards.
+
+![Partial Turkish demo](docs/partial-pack-demo.png)
 
 The Turkish pack is unaffected by the change: `tr → en` behaves exactly like the
 ordered list `["tr","en"]`.
