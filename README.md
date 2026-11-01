@@ -83,8 +83,11 @@ preference list (`ru → en → zh`) is supported by this pack. We published:
   [`patches/0001-ordered-locale-preference.patch`](patches/0001-ordered-locale-preference.patch)
   (11 files; legacy `string` preferences read as one-element lists; `snapshot.active`
   stays the first entry; lookup expands each preferred language's fallback chain
-  and ends at English; reorderable settings row). Hunks were self-checked, but the
-  patch was **not** built against the repository toolchain.
+  and ends at English; reorderable settings row). Hunks were self-checked, and the
+  patched runtime was executed against the fixture in a stub harness
+  (**17/17 semantic checks**, 10/10 files syntax-checked — see
+  [`patches/validation-report.json`](patches/validation-report.json)); it has **not**
+  been built with the repository toolchain yet.
 - **Fixture** to exercise it: [`fixtures/`](fixtures/README.md) — a 59.4 %
   Turkish subset (1728 / 2910 keys) plus `expected-behavior.json` samples for
   `["tr","en"]`, `["en","tr"]`, `["tr","zh"]` and the legacy single selection.
