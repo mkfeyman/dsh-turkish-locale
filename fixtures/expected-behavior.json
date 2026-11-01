@@ -1,0 +1,100 @@
+{
+  "fixture": "tr-partial.json",
+  "coverage": {
+    "namespaces": 64,
+    "keys": 1728,
+    "totalKeys": 2910,
+    "percent": 59.4
+  },
+  "chains": {
+    "today (single preference, language fallback)": [
+      "tr",
+      "en"
+    ],
+    "ordered [tr, en]": [
+      "tr",
+      "en"
+    ],
+    "ordered [en, tr]": [
+      "en",
+      "tr"
+    ],
+    "ordered [tr, zh]": [
+      "tr",
+      "zh",
+      "en"
+    ],
+    "ordered [ru, en, zh]": [
+      "ru",
+      "en",
+      "zh"
+    ]
+  },
+  "samples": [
+    {
+      "namespace": "chat",
+      "key": "chat.deepDiving",
+      "trFull": "Derinlemesine inceleniyor",
+      "trPartial": "Derinlemesine inceleniyor",
+      "en": "Deep diving",
+      "zh": "深度求索中",
+      "inPartial": true,
+      "today [tr]": "Derinlemesine inceleniyor",
+      "ordered [tr, en]": "Derinlemesine inceleniyor",
+      "ordered [en, tr]": "Deep diving",
+      "ordered [tr, zh, en]": "Derinlemesine inceleniyor"
+    },
+    {
+      "namespace": "chat",
+      "key": "chat.deepDivingFor",
+      "trFull": "{duration} boyunca derinlemesine inceleniyor ···",
+      "trPartial": "{duration} boyunca derinlemesine inceleniyor ···",
+      "en": "Deep diving for {duration} ···",
+      "zh": "深度求索中，用时 {duration} ···",
+      "inPartial": true,
+      "today [tr]": "{duration} boyunca derinlemesine inceleniyor ···",
+      "ordered [tr, en]": "{duration} boyunca derinlemesine inceleniyor ···",
+      "ordered [en, tr]": "Deep diving for {duration} ···",
+      "ordered [tr, zh, en]": "{duration} boyunca derinlemesine inceleniyor ···"
+    },
+    {
+      "namespace": "conversation",
+      "key": "ask.answered",
+      "trFull": "{answered}/{total} yanıtlandı",
+      "trPartial": null,
+      "en": "{answered}/{total} answered",
+      "zh": "{answered}/{total} 已回答",
+      "inPartial": false,
+      "today [tr]": "{answered}/{total} answered",
+      "ordered [tr, en]": "{answered}/{total} answered",
+      "ordered [en, tr]": "{answered}/{total} answered",
+      "ordered [tr, zh, en]": "{answered}/{total} 已回答"
+    },
+    {
+      "namespace": "settings",
+      "key": "close",
+      "trFull": "Kapat",
+      "trPartial": "Kapat",
+      "en": "Close",
+      "zh": "关闭",
+      "inPartial": true,
+      "today [tr]": "Kapat",
+      "ordered [tr, en]": "Kapat",
+      "ordered [en, tr]": "Close",
+      "ordered [tr, zh, en]": "Kapat"
+    },
+    {
+      "namespace": "common",
+      "key": "back",
+      "trFull": "Geri",
+      "trPartial": null,
+      "en": "Back",
+      "zh": "返回",
+      "inPartial": false,
+      "today [tr]": "Back",
+      "ordered [tr, en]": "Back",
+      "ordered [en, tr]": "Back",
+      "ordered [tr, zh, en]": "返回"
+    }
+  ]
+}
