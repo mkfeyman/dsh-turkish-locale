@@ -38,6 +38,17 @@ assert both behaviours:
 }
 ```
 
+## Live demo
+
+The fixture was also built into a temporary language pack (`tr-partial`,
+label `Türkçe (kısmi)`) and installed in DSH 0.2.1-rc.3. Selecting it in
+**Settings → General → Language** renders the mixed UI directly — Turkish where
+the subset has a key, English islands where it falls back:
+
+![Partial Turkish demo](https://github.com/mkfeyman/dsh-turkish-locale/raw/main/docs/partial-pack-demo.png)
+
+The demo pack was removed afterwards; the fixture and this screenshot remain.
+
 ## Using it in tests
 
 The fixture is plain dictionary data; a test can load it and register the
