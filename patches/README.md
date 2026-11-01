@@ -49,10 +49,18 @@ moment. It is shared for review under [Discussions #11699](https://github.com/de
 
 - The patch hunks were generated from the pristine tag sources and re-applied to
   them programmatically: **self-check passes (11 files)**.
-- The repository's own toolchain (pnpm install + vitest + tsc) was **not**
-  available in the environment where this draft was produced, so the updated
-  tests have **not been executed** and the TypeScript has not been type-checked
-  against the real dependency tree. Expect small adjustments before it builds.
+- The patched `src/client/index.ts` was bundled with its framework imports stubbed
+  and executed against the 59.4% fixture in a standalone harness
+  (`tools/harness/run.mjs` in the workspace): **17/17 semantic checks pass**,
+  covering ordered lookup, legacy string migration, `resolveText`, browser-order
+  retention, persistence shapes, revision/`locale/change` behaviour, and a
+  zh-only dictionary reached before the raw key. All 10 changed/new TypeScript
+  files also pass an esbuild syntax/transpile check.
+- Results: [`validation-report.json`](validation-report.json).
+- The repository's own toolchain (pnpm install + vitest + tsc against the real
+  dependency tree) was **not** available where this draft was produced, so the
+  updated specs have **not** been run through the repository's test runner and
+  full type-checking is still pending. Expect small adjustments before CI is green.
 - API shapes the surrounding packages consume (`getSnapshot().active`,
   `locale/change`, `slots.installLocale`, injected `t`) are preserved on purpose.
 
