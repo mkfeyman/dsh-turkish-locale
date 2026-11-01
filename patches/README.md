@@ -1,13 +1,19 @@
 # Patch draft: ordered locale preference (Discussion #11699)
 
-**Status:** draft, generated against the public source of **`dsh-v0.2.1-rc.3`**
-(tag commit `1f81c047fc48fa190a683e469daa699857e9afe8`). It is not a submitted
-pull request — upstream `CONTRIBUTING.md` does not accept external PRs at the
-moment. It is shared for review under [Discussions #11699](https://github.com/deepseek-ai/deepseek-harness/discussions/11699).
+**Status:** draft, not a submitted pull request — upstream `CONTRIBUTING.md`
+does not accept external PRs at the moment. Shared for review under
+[Discussions #11699](https://github.com/deepseek-ai/deepseek-harness/discussions/11699).
+
+Two variants are provided:
+
+| Patch | Base | Purpose |
+|---|---|---|
+| [`0002-ordered-locale-preference-0.2.2.patch`](0002-ordered-locale-preference-0.2.2.patch) | **`dsh-v0.2.2-alpha.2`** (commit `f3803c96…`) | **Current draft.** Rebased onto the tag that ships six additional built-in dictionaries (`ja`, `es`, `fr`, `de`, `ru`, `pt`) and the updated client/apply code. 11 files, ~755 changed lines. |
+| [`0001-ordered-locale-preference.patch`](0001-ordered-locale-preference.patch) | `dsh-v0.2.1-rc.3` (commit `1f81c047…`) | Kept for the currently installed desktop build and for comparison. |
 
 ## What it changes
 
-`packages/client/locale` only (11 files, ~723 changed lines):
+`packages/client/locale` only (11 files):
 
 | File | Change |
 |---|---|
@@ -17,8 +23,8 @@ moment. It is shared for review under [Discussions #11699](https://github.com/de
 | `src/client/index.ts` | Runtime walks the ordered preference per key (each entry followed by its declared fallback chain, then `en`); snapshot gains `preference`; `active` is the first registered entry; `setPreferences`/`addPreference`/`removePreference`/`movePreference`; `setLocale` keeps writing the legacy string; `detectBrowserLocales` keeps the browser's whole order |
 | `src/client/settings-store.ts` | Mirrors the ordered preference into the Language row |
 | `src/client/LanguageRow.tsx` | Reorderable preference list with add/move/remove, replacing the single-select pill |
-| `src/client/LanguageRow.module.css` | Styles for the list controls |
-| `src/locales/settings.ts` | en/zh copy for the new row controls |
+| `src/client/LanguageRow.module.css` | Styles for the list controls (merged with the 0.2.2 responsive/hover rules) |
+| `src/locales/settings.ts` | New row copy for **all eight** shipped languages (`zh`, `en`, `ja`, `es`, `fr`, `de`, `ru`, `pt`) |
 | `tests/ordered-preference.client.spec.ts` | New coverage: legacy string migration, per-key order, `resolveText`, browser order, persistence, events |
 | `tests/language-row.client.spec.tsx` | Updated for the list UI |
 | `tests/settings-store.client.spec.ts` | Updated for the `preference` mirror |
@@ -44,21 +50,28 @@ moment. It is shared for review under [Discussions #11699](https://github.com/de
 - **`locale/change` only fires when the active language changes**; reorder-only
   updates bump the revision so the settings row and rendered text refresh without
   the event storm the current code deliberately avoids.
+- **0.2.2 built-ins.** The six extra dictionaries 0.2.2 registers through
+  `addLanguage` are untouched; they simply appear in the ordered catalog and can
+  be reordered/removed like any other language.
 
 ## Verification status
 
-- The patch hunks were generated from the pristine tag sources and re-applied to
-  them programmatically: **self-check passes (11 files)**.
-- The patched `src/client/index.ts` was bundled with its framework imports stubbed
+- Patch hunks are generated from pristine tag sources and re-applied
+  programmatically: **self-check passes (11 files)** for both variants.
+- The patched `src/client/index.ts` is bundled with its framework imports stubbed
   and executed against the 59.4% fixture in a standalone harness
-  (`tools/harness/run.mjs` in the workspace): **17/17 semantic checks pass**,
-  covering ordered lookup, legacy string migration, `resolveText`, browser-order
-  retention, persistence shapes, revision/`locale/change` behaviour, and a
-  zh-only dictionary reached before the raw key. All 10 changed/new TypeScript
-  files also pass an esbuild syntax/transpile check.
-- Results: [`validation-report.json`](validation-report.json).
+  (`tools/harness/run.mjs` in the workspace):
+  - base `dsh-v0.2.2-alpha.2`: **17/17 semantic checks pass**, 10/10 changed/new
+    TypeScript files pass a syntax/transpile check →
+    [`validation-report-0.2.2.json`](validation-report-0.2.2.json)
+  - base `dsh-v0.2.1-rc.3`: same results →
+    [`validation-report.json`](validation-report.json)
+- Coverage: ordered lookup (`[tr,en]` vs `[en,tr]`), legacy string migration,
+  `resolveText`, browser-order retention, persistence shapes, revision and
+  `locale/change` behaviour on reorder, and a zh-only dictionary reached before
+  the raw key.
 - The repository's own toolchain (pnpm install + vitest + tsc against the real
-  dependency tree) was **not** available where this draft was produced, so the
+  dependency tree) was **not** available where these drafts were produced, so the
   updated specs have **not** been run through the repository's test runner and
   full type-checking is still pending. Expect small adjustments before CI is green.
 - API shapes the surrounding packages consume (`getSnapshot().active`,
@@ -67,13 +80,20 @@ moment. It is shared for review under [Discussions #11699](https://github.com/de
 ## Apply
 
 ```sh
-git checkout dsh-v0.2.1-rc.3
-git apply /path/to/0001-ordered-locale-preference.patch
+# current draft (0.2.2-alpha.2 source)
+git checkout dsh-v0.2.2-alpha.2
+git apply /path/to/0002-ordered-locale-preference-0.2.2.patch
 pnpm install
 pnpm --filter @deepseek-ai/dsh-client-locale test
+
+# installed-build variant (0.2.1-rc.3 source)
+git checkout dsh-v0.2.1-rc.3
+git apply /path/to/0001-ordered-locale-preference.patch
 ```
 
 ## Fixture
 
-`../fixtures/` contains a deterministic 59.4% Turkish subset and expected lookup
-samples to exercise the ordered list against the current single-chain behaviour.
+`../fixtures/` contains a deterministic 59.4% Turkish subset, expected lookup
+samples, and a `version-coverage.json` note: the fixture is rc.3-based, so the
+0.2.2 delta (9 namespaces / 853 strings) exercises the English fallback rather
+than Turkish coverage.
