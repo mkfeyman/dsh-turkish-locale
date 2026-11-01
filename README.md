@@ -69,8 +69,28 @@ available to pnpm on the machine.
 | `cordis.patch.yml` | Bundle patch: adds the `tr-locale` row and defaults the locale to `tr` |
 | `locales/tr.json` | Full namespace → key → Turkish dictionary data |
 | `market-index.json` | Plugin market index listing this bundle (format 1) |
+| `fixtures/` | Deterministic 59.4 % Turkish subset + expected ordered-lookup samples |
+| `patches/` | Draft patch for [ordered locale preference (#11699)](https://github.com/deepseek-ai/deepseek-harness/discussions/11699) |
 | `locale/` | Package-localized title/description |
 | `docs/` | Screenshots and market icon |
+
+## Ordered locale preference (Discussion #11699)
+
+The community proposal to replace the single UI locale with an ordered
+preference list (`ru → en → zh`) is supported by this pack. We published:
+
+- **Patch draft** for `packages/client/locale` against DSH `dsh-v0.2.1-rc.3`:
+  [`patches/0001-ordered-locale-preference.patch`](patches/0001-ordered-locale-preference.patch)
+  (11 files; legacy `string` preferences read as one-element lists; `snapshot.active`
+  stays the first entry; lookup expands each preferred language's fallback chain
+  and ends at English; reorderable settings row). Hunks were self-checked, but the
+  patch was **not** built against the repository toolchain.
+- **Fixture** to exercise it: [`fixtures/`](fixtures/README.md) — a 59.4 %
+  Turkish subset (1728 / 2910 keys) plus `expected-behavior.json` samples for
+  `["tr","en"]`, `["en","tr"]`, `["tr","zh"]` and the legacy single selection.
+
+The Turkish pack is unaffected by the change: `tr → en` behaves exactly like the
+ordered list `["tr","en"]`.
 
 ## Provenance
 
