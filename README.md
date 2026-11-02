@@ -97,6 +97,13 @@ preference list (`ru → en → zh`) is supported by this pack. We published:
   `["tr","en"]`, `["en","tr"]`, `["tr","zh"]` and the legacy single selection;
   `version-coverage.json` records why the 0.2.2 delta (9 namespaces / 853 strings)
   falls through to English in fixture tests.
+- **Layer-2 audit:** [`tools/audit_locale_gaps.py`](tools/audit_locale_gaps.py)
+  measures the case ordering cannot fix — namespaces that register only `zh` and
+  CJK keys that would leak as raw text — from a local dictionary dump
+  (`{namespace: {locale: {key: value}}}`). Sample: [`fixtures/audit-sample.json`](fixtures/audit-sample.json).
+  Classification confirmed with `@ragnoryok1`: typed (zh+en) dictionaries are
+  fixed by ordering; per-locale `zh`-only dictionaries are not, and a tarball
+  listing cannot distinguish them, so the rule belongs at registration time.
 - **Live demo:** the fixture was installed as a temporary `tr-partial` language
   pack and selected in Settings → General → Language, rendering a mixed
   Turkish/English UI (screenshot below). The demo pack was removed afterwards.
