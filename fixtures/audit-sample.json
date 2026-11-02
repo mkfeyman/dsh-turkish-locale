@@ -1,0 +1,13 @@
+{
+  "connect-workbuddy-style": {
+    "zh": { "保存设置": "保存设置", "连接": "连接" },
+    "en": { "Save settings": "Save settings", "Connect": "Connect" }
+  },
+  "zh-only-plugin": {
+    "zh": { "下一步:改用其他方法重新检验": "下一步:改用其他方法重新检验" }
+  },
+  "typed-module": {
+    "zh": { "hello": "你好" },
+    "en": { "hello": "Hello" }
+  }
+}
