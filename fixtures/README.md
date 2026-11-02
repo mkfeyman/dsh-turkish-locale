@@ -61,6 +61,21 @@ the subset has a key, English islands where it falls back:
 
 The demo pack was removed afterwards; the fixture and this screenshot remain.
 
+## Layer-2 audit (Chinese-key leak detection)
+
+An ordered preference cannot fix a namespace that only registers `zh`: the raw
+Chinese key still shows. To measure that gap locally without sharing dictionary
+data, use the standalone audit:
+
+```sh
+python tools/audit_locale_gaps.py <dump.json>
+```
+
+It reads `{namespace: {locale: {key: value}}}` and reports namespaces missing
+`en`, CJK keys that would leak, and typed (zh+en) vs per-locale counts. A small
+sample is at [`audit-sample.json`](audit-sample.json). Only the printed counts
+need to be shared back.
+
 ## Using it in tests
 
 The fixture is plain dictionary data; a test can load it and register the
