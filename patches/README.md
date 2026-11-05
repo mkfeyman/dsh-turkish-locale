@@ -4,12 +4,13 @@
 does not accept external PRs at the moment. Shared for review under
 [Discussions #11699](https://github.com/deepseek-ai/deepseek-harness/discussions/11699).
 
-Two variants are provided:
+Three variants are provided:
 
 | Patch | Base | Purpose |
 |---|---|---|
-| [`0002-ordered-locale-preference-0.2.2.patch`](0002-ordered-locale-preference-0.2.2.patch) | **`dsh-v0.2.2-alpha.2`** (commit `f3803c96…`) | **Current draft.** Rebased onto the tag that ships six additional built-in dictionaries (`ja`, `es`, `fr`, `de`, `ru`, `pt`) and the updated client/apply code. 11 files, ~755 changed lines. |
-| [`0001-ordered-locale-preference.patch`](0001-ordered-locale-preference.patch) | `dsh-v0.2.1-rc.3` (commit `1f81c047…`) | Kept for the currently installed desktop build and for comparison. |
+| [`0003-ordered-locale-preference-0.2.2-rc1.patch`](0003-ordered-locale-preference-0.2.2-rc1.patch) | **`dsh-v0.2.2-rc.1`** (tag commit `66491b05…`) | **Current draft.** Same changes as `0002`; only `tests/language-row.client.spec.tsx` moved upstream between alpha.2 and rc.1 (the spec gained `contextMenuHook`), so the rebase is a spec merge — no runtime changes. 11 files, ~755 changed lines. |
+| [`0002-ordered-locale-preference-0.2.2.patch`](0002-ordered-locale-preference-0.2.2.patch) | `dsh-v0.2.2-alpha.2` (commit `f3803c96…`) | Kept for comparison; superseded by `0003`. |
+| [`0001-ordered-locale-preference.patch`](0001-ordered-locale-preference.patch) | `dsh-v0.2.1-rc.3` (commit `1f81c047…`) | Kept for the originally installed desktop build and for comparison. |
 
 ## What it changes
 
@@ -57,12 +58,14 @@ Two variants are provided:
 ## Verification status
 
 - Patch hunks are generated from pristine tag sources and re-applied
-  programmatically: **self-check passes (11 files)** for both variants.
+  programmatically: **self-check passes (11 files)** for every variant.
 - The patched `src/client/index.ts` is bundled with its framework imports stubbed
   and executed against the 59.4% fixture in a standalone harness
   (`tools/harness/run.mjs` in the workspace):
-  - base `dsh-v0.2.2-alpha.2`: **17/17 semantic checks pass**, 10/10 changed/new
+  - base `dsh-v0.2.2-rc.1`: **17/17 semantic checks pass**, 10/10 changed/new
     TypeScript files pass a syntax/transpile check →
+    [`validation-report-0.2.2-rc1.json`](validation-report-0.2.2-rc1.json)
+  - base `dsh-v0.2.2-alpha.2`: same results →
     [`validation-report-0.2.2.json`](validation-report-0.2.2.json)
   - base `dsh-v0.2.1-rc.3`: same results →
     [`validation-report.json`](validation-report.json)
@@ -80,9 +83,9 @@ Two variants are provided:
 ## Apply
 
 ```sh
-# current draft (0.2.2-alpha.2 source)
-git checkout dsh-v0.2.2-alpha.2
-git apply /path/to/0002-ordered-locale-preference-0.2.2.patch
+# current draft (0.2.2-rc.1 source)
+git checkout dsh-v0.2.2-rc.1
+git apply /path/to/0003-ordered-locale-preference-0.2.2-rc1.patch
 pnpm install
 pnpm --filter @deepseek-ai/dsh-client-locale test
 
