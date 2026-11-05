@@ -10,9 +10,10 @@ no changes to the packaged application, no rebuild.
 
 - Registers `tr` with an `en` fallback through `ctx.locale.addLanguage` and
   `ctx.locale.register`.
-- Translates **64 namespaces / 2,910 strings** — 100% of the English UI copy
-  shipped in DSH **0.2.1-rc.3** (commit `be72761`). Placeholders, Markdown,
-  separator strings and punctuation are preserved and validated against source.
+- Translates **73 namespaces / 3,838 strings** — 100% of the English UI copy
+  shipped in DSH **0.2.2-rc.1** (commit `c59d10a`; v1.1.0). Placeholders,
+  Markdown, separator strings and punctuation are preserved and validated
+  against source.
 - The language appears in **Settings → General → Language → Türkçe**; the choice
   persists as `locale.preference` in `cordis.patch.yml`, `<html lang>` follows the
   active locale, and English/Turkish switching works live in both directions.
@@ -68,11 +69,13 @@ available to pnpm on the machine.
   (`addLanguage`, `register(ns, locale, dict)`, `resolveText`, snapshot) are
   unchanged from 0.2.1-rc.3. See
   [`docs/upgrade-analysis-0.2.2-rc1.md`](docs/upgrade-analysis-0.2.2-rc1.md).
-- Coverage note: the dictionaries were extracted from 0.2.1-rc.3. 0.2.2-rc.1 adds
-  **981 keys / 10 namespaces** (`forgePanel` 253, `liveshare` 225, `stats` 177,
-  …) that are not translated yet and therefore render in English; 60 English
-  source values changed. Measured delta:
-  [`fixtures/version-coverage.json`](fixtures/version-coverage.json).
+- **Coverage (v1.1.0):** re-extracted from 0.2.2-rc.1 and translated to
+  **73 namespaces / 3,838 strings — 100 %** of the shipped English UI copy,
+  including the 981 strings added by 0.2.2 (10 new namespaces:
+  `forgePanel` 253, `liveshare` 225, `stats` 177, …). The 60 changed English
+  source values were reviewed and updated where the meaning moved. Measured
+  delta and fixture notes: [`fixtures/version-coverage.json`](fixtures/version-coverage.json).
+  Release notes: [`docs/release-notes-v1.1.0.md`](docs/release-notes-v1.1.0.md).
 
 ## Repository layout
 
