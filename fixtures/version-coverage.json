@@ -32,5 +32,12 @@
     "changedEnglishValues": 60,
     "coveredByThisFixture": 0,
     "behaviour": "Untranslated entries fall through the ordered preference to English; the fixture demonstrates the lookup/ordering semantics, not full 0.2.2 coverage."
+  },
+  "pack": {
+    "version": "1.1.0",
+    "released": "2026-11-05",
+    "namespaces": 73,
+    "keys": 3838,
+    "coverage": "100% of the 0.2.2-rc.1 English source"
   }
 }
