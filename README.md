@@ -60,6 +60,20 @@ available to pnpm on the machine.
 3. With HMR enabled the pack activates in the running app; otherwise restart the
    app (or reload the Web GUI). Choose **Ayarlar → Genel → Dil** to switch.
 
+## Compatibility
+
+- Verified working on **DSH 0.2.2-rc.1** (commit `c59d10a`): the pack loads from
+  the boot graph, the selector lists 8 built-in languages plus Türkçe, switching
+  round-trips, and `locale.preference: tr` persists. Runtime contracts
+  (`addLanguage`, `register(ns, locale, dict)`, `resolveText`, snapshot) are
+  unchanged from 0.2.1-rc.3. See
+  [`docs/upgrade-analysis-0.2.2-rc1.md`](docs/upgrade-analysis-0.2.2-rc1.md).
+- Coverage note: the dictionaries were extracted from 0.2.1-rc.3. 0.2.2-rc.1 adds
+  **981 keys / 10 namespaces** (`forgePanel` 253, `liveshare` 225, `stats` 177,
+  …) that are not translated yet and therefore render in English; 60 English
+  source values changed. Measured delta:
+  [`fixtures/version-coverage.json`](fixtures/version-coverage.json).
+
 ## Repository layout
 
 | Path | Purpose |
