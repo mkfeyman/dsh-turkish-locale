@@ -96,23 +96,18 @@ available to pnpm on the machine.
 The community proposal to replace the single UI locale with an ordered
 preference list (`ru → en → zh`) is supported by this pack. We published:
 
-- **Patch draft** for `packages/client/locale`, now rebased to
-  **`dsh-v0.2.2-rc.1`** (tag commit `66491b05…`):
+- **Patch draft** for `packages/client/locale`, rebased to **`dsh-v0.2.2-rc.1`**
+  (tag commit `66491b05…`) and **CI-validated**:
   [`patches/0003-ordered-locale-preference-0.2.2-rc1.patch`](patches/0003-ordered-locale-preference-0.2.2-rc1.patch)
-  (11 files; legacy `string` preferences read as one-element lists; `snapshot.active`
-  stays the first entry; lookup expands each preferred language's fallback chain
-  and ends at English; reorderable settings row). Between alpha.2 and rc.1 only
-  the `language-row` spec moved upstream, so the rebase is a spec merge — the
-  runtime diff is unchanged. Older variants remain at
-  [`patches/0002-ordered-locale-preference-0.2.2.patch`](patches/0002-ordered-locale-preference-0.2.2.patch)
-  (alpha.2) and
-  [`patches/0001-ordered-locale-preference.patch`](patches/0001-ordered-locale-preference.patch)
-  (rc.3). Hunks were self-checked, and the patched runtime was executed against
-  the fixture in a stub harness (**17/17 semantic checks**, 10/10 files
-  syntax-checked — see
-  [`patches/validation-report-0.2.2-rc1.json`](patches/validation-report-0.2.2-rc1.json)
-  and the alpha.2 [`validation-report-0.2.2.json`](patches/validation-report-0.2.2.json));
-  it has **not** been built with the repository toolchain yet.
+  (17 files: the locale package — legacy `string` preferences read as
+  one-element lists, `snapshot.active` stays the first entry, lookup expands each
+  preferred language's fallback chain and ends at English, reorderable settings
+  row — plus 5 sibling test fixtures whose `LocaleSnapshot` literals gain
+  `preference`). Applied to a checked-out rc.1 tree: **vitest 79/79**, sanctioned
+  typecheck gate **5/5**, patch self-check reproduces the tree exactly — see
+  [`patches/validation-report-0.2.2-rc1.json`](patches/validation-report-0.2.2-rc1.json).
+  Older variants: [`0002`](patches/0002-ordered-locale-preference-0.2.2.patch)
+  (alpha.2) and [`0001`](patches/0001-ordered-locale-preference.patch) (rc.3).
 - **Fixture** to exercise it: [`fixtures/`](fixtures/README.md) — a 59.4 %
   Turkish subset (1728 / 2910 keys) plus `expected-behavior.json` samples for
   `["tr","en"]`, `["en","tr"]`, `["tr","zh"]` and the legacy single selection;
