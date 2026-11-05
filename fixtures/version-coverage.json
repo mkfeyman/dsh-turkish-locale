@@ -7,22 +7,29 @@
     "translated": 1728,
     "percent": 59.4
   },
-  "newerSource": {
-    "tag": "dsh-v0.2.2-alpha.2",
-    "reportedBy": "@ragnoryok1 (#11699)",
+  "installedSource": {
+    "version": "0.2.2-rc.1",
+    "commit": "c59d10a",
+    "namespaces": 73,
+    "keys": 3838,
+    "measuredOn": "2026-11-05",
     "addedNamespaces": [
-      {"name": "liveshare", "keys": 224},
-      {"name": "forgePanel", "keys": 199},
+      {"name": "forgePanel", "keys": 253},
+      {"name": "liveshare", "keys": 225},
       {"name": "stats", "keys": 177},
       {"name": "creationRecommendations", "keys": 55},
-      {"name": "cuaPermissions", "keys": 49},
       {"name": "pluginRecommendations", "keys": 25},
       {"name": "actionCards", "keys": 14},
+      {"name": "fileActions", "keys": 12},
+      {"name": "contextMenu", "keys": 1},
       {"name": "fileDrag", "keys": 1},
       {"name": "messageQuotes", "keys": 1}
     ],
-    "addedKeysInExistingNamespaces": 108,
-    "addedKeysTotal": 853,
+    "removedNamespaces": ["deepseek-model-label-1017"],
+    "addedKeysInExistingNamespaces": 217,
+    "addedKeysTotal": 981,
+    "removedKeysTotal": 52,
+    "changedEnglishValues": 60,
     "coveredByThisFixture": 0,
     "behaviour": "Untranslated entries fall through the ordered preference to English; the fixture demonstrates the lookup/ordering semantics, not full 0.2.2 coverage."
   }
