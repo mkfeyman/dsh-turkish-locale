@@ -8,7 +8,7 @@ Three variants are provided:
 
 | Patch | Base | Purpose |
 |---|---|---|
-| [`0003-ordered-locale-preference-0.2.2-rc1.patch`](0003-ordered-locale-preference-0.2.2-rc1.patch) | **`dsh-v0.2.2-rc.1`** (tag commit `66491b05…`) | **Current draft.** Same changes as `0002`; only `tests/language-row.client.spec.tsx` moved upstream between alpha.2 and rc.1 (the spec gained `contextMenuHook`), so the rebase is a spec merge — no runtime changes. 11 files, ~755 changed lines. |
+| [`0003-ordered-locale-preference-0.2.2-rc1.patch`](0003-ordered-locale-preference-0.2.2-rc1.patch) | **`dsh-v0.2.2-rc.1`** (tag commit `66491b05…`) | **Current draft, CI-validated.** 17 files: the locale package changes plus 5 sibling test fixtures whose `LocaleSnapshot` literals gain the `preference` field (they stopped typechecking once the snapshot carries the ordered list). Real repo validation: vitest **79/79**, sanctioned typecheck gate **5/5**. |
 | [`0002-ordered-locale-preference-0.2.2.patch`](0002-ordered-locale-preference-0.2.2.patch) | `dsh-v0.2.2-alpha.2` (commit `f3803c96…`) | Kept for comparison; superseded by `0003`. |
 | [`0001-ordered-locale-preference.patch`](0001-ordered-locale-preference.patch) | `dsh-v0.2.1-rc.3` (commit `1f81c047…`) | Kept for the originally installed desktop build and for comparison. |
 
@@ -29,6 +29,8 @@ Three variants are provided:
 | `tests/ordered-preference.client.spec.ts` | New coverage: legacy string migration, per-key order, `resolveText`, browser order, persistence, events |
 | `tests/language-row.client.spec.tsx` | Updated for the list UI |
 | `tests/settings-store.client.spec.ts` | Updated for the `preference` mirror |
+| `tests/apply.client.spec.ts` | Fixture literal gains `preference` (snapshot now requires it) |
+| `ui-input-trigger`, `ui-plugin-manager`, `ui-plugin-market` (×2), `client-ui-cot-translation` tests | Sibling `LocaleSnapshot` fixtures gain the `preference` field so the client aggregate typechecks |
 
 ## Design decisions
 
@@ -58,9 +60,23 @@ Three variants are provided:
 ## Verification status
 
 - Patch hunks are generated from pristine tag sources and re-applied
-  programmatically: **self-check passes (11 files)** for every variant.
-- The patched `src/client/index.ts` is bundled with its framework imports stubbed
-  and executed against the 59.4% fixture in a standalone harness
+  programmatically: **self-check passes** for every variant (applying `0003` to a
+  pristine rc.1 tree reproduces the patched tree exactly, 17 file sections).
+- **Real repository validation (base rc.1):** the zipball of `dsh-v0.2.2-rc.1`
+  was checked out, the patch applied, dependencies installed
+  (`pnpm@11.28.5`, 1,434 packages), and the repo's own tooling run:
+  - `vitest run packages/client/locale` → **9/9 files, 79/79 tests pass**
+    (including the new `ordered-preference.client.spec.ts` and the list-UI
+    `language-row.client.spec.tsx`).
+  - `pnpm run typecheck` (sanctioned gate) → **5/5 gates pass**: Host Typert,
+    host compiler, client compiler, host aggregate check, client aggregate check.
+    The first run failed on 8 sibling test fixtures that construct
+    `LocaleSnapshot` literals without `preference`; the patch updates those
+    fixtures, so the client aggregate is green.
+  - `tsc -b packages/client/locale/tsconfig.client.json` → no errors in the
+    locale package.
+- The patched `src/client/index.ts` is additionally bundled with its framework
+  imports stubbed and executed against the 59.4% fixture in a standalone harness
   (`tools/harness/run.mjs` in the workspace):
   - base `dsh-v0.2.2-rc.1`: **17/17 semantic checks pass**, 10/10 changed/new
     TypeScript files pass a syntax/transpile check →
@@ -73,12 +89,9 @@ Three variants are provided:
   `resolveText`, browser-order retention, persistence shapes, revision and
   `locale/change` behaviour on reorder, and a zh-only dictionary reached before
   the raw key.
-- The repository's own toolchain (pnpm install + vitest + tsc against the real
-  dependency tree) was **not** available where these drafts were produced, so the
-  updated specs have **not** been run through the repository's test runner and
-  full type-checking is still pending. Expect small adjustments before CI is green.
 - API shapes the surrounding packages consume (`getSnapshot().active`,
-  `locale/change`, `slots.installLocale`, injected `t`) are preserved on purpose.
+  `locale/change`, `slots.installLocale`, injected `t`) are preserved on purpose;
+  the only cross-package edits are the sibling test fixtures above.
 
 ## Apply
 
