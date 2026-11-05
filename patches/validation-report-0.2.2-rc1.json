@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-05T18:12:51.386Z",
+  "generatedAt": "2026-11-05T18:28:36.293Z",
   "base": {
     "tag": "dsh-v0.2.2-rc.1",
     "commit": "66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db"
@@ -191,5 +191,20 @@
     "passed": 17,
     "failed": 0,
     "total": 17
+  },
+  "repoValidation": {
+    "checkedOutFrom": "zipball of tag dsh-v0.2.2-rc.1 (commit 66491b05)",
+    "install": "pnpm@11.28.5 install: OK (1,434 packages)",
+    "vitest": {
+      "command": "vitest run packages/client/locale",
+      "files": "9 passed (9)",
+      "tests": "79 passed (79)"
+    },
+    "typecheck": {
+      "localeProject": "tsc -b packages/client/locale/tsconfig.client.json: no errors in packages/client/locale",
+      "sanctionedGate": "pnpm run typecheck: 5/5 gates PASS (Host Typert, host compiler, client compiler, host aggregate check, client aggregate check)",
+      "note": "The client aggregate initially failed on 8 sibling test fixtures constructing LocaleSnapshot without preference; the patch updates those fixtures."
+    },
+    "patchSelfCheck": "17 file sections; applying to a pristine tree reproduces the patched tree exactly"
   }
 }
