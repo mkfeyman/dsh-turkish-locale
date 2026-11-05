@@ -34,8 +34,8 @@
         "tr": "Türkçe dil paketi"
       },
       "description": {
-        "en": "Adds Turkish to Settings → General → Language: 64 namespaces / 2,910 strings, 100% of the shipped English UI copy.",
-        "tr": "Ayarlar → Genel → Dil altına Türkçe ekler: 64 ad alanı / 2.910 dizgi, gönderilen İngilizce arayüzün tamamı."
+        "en": "Adds Turkish to Settings → General → Language: 73 namespaces / 3,838 strings, 100% of the shipped English UI copy (0.2.2-rc.1).",
+        "tr": "Ayarlar → Genel → Dil altına Türkçe ekler: 73 ad alanı / 3.838 dizgi, gönderilen İngilizce arayüzün tamamı (0.2.2-rc.1)."
       },
       "icon": "docs/icon.png",
       "author": "mkfeyman",
@@ -56,16 +56,28 @@
         ]
       },
       "dist-tags": {
-        "latest": "1.0.0"
+        "latest": "1.1.0"
       },
       "versions": [
         {
-          "version": "1.0.0",
-          "publishTimestamp": 1792950020,
+          "version": "1.1.0",
+          "publishTimestamp": 1793894437,
           "source": {
             "type": "git",
             "url": "https://github.com/mkfeyman/dsh-turkish-locale",
-            "commit": "4536962ee24de4820e9d7f40a73ee77cea812bbe"
+            "commit": "e224d7a42cc50a4515eeed415de275b6ad0f2472"
+          },
+          "engines": {
+            "dsh": ">=0.2.1-rc.3 <0.3.0"
+          }
+        },
+        {
+          "version": "1.0.0",
+          "publishTimestamp": 1793894437,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/mkfeyman/dsh-turkish-locale",
+            "commit": "e224d7a42cc50a4515eeed415de275b6ad0f2472"
           },
           "engines": {
             "dsh": ">=0.2.1-rc.3 <0.3.0"
