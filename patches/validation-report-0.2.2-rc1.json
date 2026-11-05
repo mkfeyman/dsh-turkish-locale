@@ -1,0 +1,195 @@
+{
+  "generatedAt": "2026-11-05T18:12:51.386Z",
+  "base": {
+    "tag": "dsh-v0.2.2-rc.1",
+    "commit": "66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db"
+  },
+  "runtimeBundle": "contrib/upstream/locale-0.2.2-rc1-patched/src/client/index.ts (framework imports stubbed)",
+  "syntax": [
+    {
+      "file": "src/locale-settings.ts",
+      "syntax": "ok"
+    },
+    {
+      "file": "src/index.ts",
+      "syntax": "ok"
+    },
+    {
+      "file": "src/client/bootstrap.ts",
+      "syntax": "ok"
+    },
+    {
+      "file": "src/client/index.ts",
+      "syntax": "ok"
+    },
+    {
+      "file": "src/client/settings-store.ts",
+      "syntax": "ok"
+    },
+    {
+      "file": "src/client/LanguageRow.tsx",
+      "syntax": "ok"
+    },
+    {
+      "file": "src/locales/settings.ts",
+      "syntax": "ok"
+    },
+    {
+      "file": "tests/ordered-preference.client.spec.ts",
+      "syntax": "ok"
+    },
+    {
+      "file": "tests/language-row.client.spec.tsx",
+      "syntax": "ok"
+    },
+    {
+      "file": "tests/settings-store.client.spec.ts",
+      "syntax": "ok"
+    }
+  ],
+  "fixture": {
+    "namespaces": 64,
+    "keys": 1728,
+    "totalKeys": 2910,
+    "percent": 59.4
+  },
+  "checks": [
+    {
+      "name": "ordered [tr,en] answers from Turkish",
+      "pass": true,
+      "actual": "Derinlemesine inceleniyor",
+      "expected": "Derinlemesine inceleniyor"
+    },
+    {
+      "name": "ordered [en,tr] answers from English",
+      "pass": true,
+      "actual": "Deep diving",
+      "expected": "Deep diving"
+    },
+    {
+      "name": "ordered [tr,en] falls back to English for a missing key",
+      "pass": true,
+      "actual": "{answered}/{total} answered",
+      "expected": "{answered}/{total} answered"
+    },
+    {
+      "name": "legacy setLocale keeps today’s tr->en chain",
+      "pass": true,
+      "actual": "{answered}/{total} answered",
+      "expected": "{answered}/{total} answered"
+    },
+    {
+      "name": "ordered list reaches a zh-only dictionary before the raw key",
+      "pass": true,
+      "actual": "从中文来",
+      "expected": "从中文来"
+    },
+    {
+      "name": "legacy single preference stops at en before zh",
+      "pass": true,
+      "actual": "key.onlyZh",
+      "expected": "key.onlyZh"
+    },
+    {
+      "name": "resolveText follows [tr,en]",
+      "pass": true,
+      "actual": "Derinlemesine inceleniyor",
+      "expected": "Derinlemesine inceleniyor"
+    },
+    {
+      "name": "resolveText follows [en,tr]",
+      "pass": true,
+      "actual": "Deep diving",
+      "expected": "Deep diving"
+    },
+    {
+      "name": "legacy resolveText keeps tr->en",
+      "pass": true,
+      "actual": "Derinlemesine inceleniyor",
+      "expected": "Derinlemesine inceleniyor"
+    },
+    {
+      "name": "browser order preserved",
+      "pass": true,
+      "actual": [
+        "ja",
+        "zh"
+      ],
+      "expected": [
+        "ja",
+        "zh"
+      ]
+    },
+    {
+      "name": "legacy setLocale writes a string",
+      "pass": true,
+      "actual": [
+        "preference",
+        "en"
+      ],
+      "expected": [
+        "preference",
+        "en"
+      ]
+    },
+    {
+      "name": "setPreferences writes an ordered array",
+      "pass": true,
+      "actual": [
+        "preference",
+        [
+          "zh",
+          "en"
+        ]
+      ],
+      "expected": [
+        "preference",
+        [
+          "zh",
+          "en"
+        ]
+      ]
+    },
+    {
+      "name": "snapshot exposes the ordered list",
+      "pass": true,
+      "actual": [
+        "zh",
+        "en"
+      ],
+      "expected": [
+        "zh",
+        "en"
+      ]
+    },
+    {
+      "name": "snapshot.active is the first entry",
+      "pass": true,
+      "actual": "zh",
+      "expected": "zh"
+    },
+    {
+      "name": "reorder moves the revision",
+      "pass": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "reorder emits locale/change when the active language changes",
+      "pass": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "name": "no-op preference write leaves the revision alone",
+      "pass": true,
+      "actual": 3,
+      "expected": 3
+    }
+  ],
+  "summary": {
+    "passed": 17,
+    "failed": 0,
+    "total": 17
+  }
+}
