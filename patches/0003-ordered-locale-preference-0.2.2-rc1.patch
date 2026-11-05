@@ -1,236 +1,89 @@
---- a/packages/client/locale/src/client/LanguageRow.module.css
-+++ b/packages/client/locale/src/client/LanguageRow.module.css
-@@ -3,7 +3,7 @@
+--- a/packages/client/locale/src/locale-settings.ts
++++ b/packages/client/locale/src/locale-settings.ts
+@@ -5,7 +5,7 @@
+ /** Settings namespace owned by the locale plugin. */
+ export const LOCALE_SETTINGS_NAMESPACE = 'locale'
  
- .row {
-   display: flex;
--  align-items: center;
-+  align-items: flex-start;
-   gap: 8px;
-   padding: 16px 0;
-   border-bottom: 0.5px solid var(--dsw-alias-border-l2);
-@@ -33,6 +33,68 @@
-   color: var(--dsw-alias-label-primary);
- }
+-/** Field carrying an explicit locale selection; absence delegates to the browser. */
++/** Field carrying an explicit ordered locale preference; absence delegates to the browser. */
+ export const LOCALE_PREFERENCE_FIELD = 'preference'
  
-+.hint {
-+  font-size: 12px;
-+  line-height: 18px;
-+  color: var(--dsw-alias-label-secondary);
-+}
-+
-+.list {
-+  display: flex;
-+  flex-direction: column;
-+  gap: 4px;
-+  margin: 4px 0 0;
-+  padding: 0;
-+  list-style: none;
-+}
-+
-+.preferenceRow {
-+  display: flex;
-+  align-items: center;
-+  gap: 8px;
-+  min-height: 32px;
-+}
-+
-+.preferenceLabel {
-+  flex: 1;
-+  min-width: 0;
-+  font-size: 14px;
-+  line-height: 22px;
-+  color: var(--dsw-alias-label-primary);
-+}
-+
-+.controls {
-+  display: inline-flex;
-+  align-items: center;
-+  gap: 4px;
-+}
-+
-+.control {
-+  display: inline-flex;
-+  align-items: center;
-+  justify-content: center;
-+  width: 28px;
-+  height: 28px;
-+  padding: 0;
-+  border: none;
-+  border-radius: var(--dsw-radius-md);
-+  background: var(--dsw-alias-bg-module-platform);
-+  font: inherit;
-+  font-size: 14px;
-+  line-height: 1;
-+  color: var(--dsw-alias-label-primary);
-+  cursor: pointer;
-+}
-+
-+.control:hover:enabled {
-+  background: var(--dsw-alias-interactive-bg-hover);
-+}
-+
-+.control:disabled {
-+  opacity: 0.4;
-+  cursor: default;
-+}
-+
- /* Language selector uses the standard control size. */
- .selector {
-   display: inline-flex;
---- a/packages/client/locale/src/client/LanguageRow.tsx
-+++ b/packages/client/locale/src/client/LanguageRow.tsx
-@@ -1,8 +1,11 @@
- /**
-  * Language preference row registered into the General section item slot
-- * (figma 501:30011 'Setting-Cell'): title + selector pill opening the locale
-- * menu. Registered by this package — the locale feature owns its own
-- * settings surface.
-+ * (figma 501:30011 'Setting-Cell'): title + ordered preference list plus an
-+ * "add language" menu. Registered by this package — the locale feature owns
-+ * its own settings surface.
-+ *
-+ * The first entry is the active interface language; later entries answer
-+ * missing strings before English and the raw key (browser-style preference).
-  */
- import { useState } from 'react'
- import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
-@@ -11,10 +14,12 @@
- import type { createLanguageRowStore } from './settings-store.ts'
- import css from './LanguageRow.module.css'
+ /** Accepted BCP 47-style language ids. */
+@@ -20,15 +20,50 @@
+ /** Open locale identifier accepted from language-pack plugins. */
+ export type LocaleId = string
  
--/** Injected business face: the preference write (t rides the standard locale seat). */
-+/** Injected business face: the preference writes (t rides the standard locale seat). */
- export interface LanguageRowInjected {
--  /** Switch the active locale (a registered locale id). */
-+  /** Switch to one locale (legacy single-selection entry point). */
-   setLocale: (id: string) => void
-+  /** Replace the ordered locale preference. */
-+  setPreferences: (ids: readonly string[]) => void
- }
- 
- /** Full component props: runtime share + store share + locale seat + injected face. */
-@@ -27,41 +32,93 @@
-  * @param props - composed slot props.
-  * @returns the row element tree.
-  */
--export function LanguageRow({ t, setLocale, useStore }: LanguageRowComponentProps) {
--  const active = useStore(s => s.active)
-+export function LanguageRow({ t, setPreferences, useStore }: LanguageRowComponentProps) {
-+  const preference = useStore(s => s.preference)
-   const options = useStore(s => s.options)
-   const [open, setOpen] = useState(false)
--  const activeLabel = options.find(o => o.id === active)?.label ?? active
-+  const labels = new Map(options.map(option => [option.id.toLowerCase(), option.label]))
-+  const label = (id: string): string => labels.get(id.toLowerCase()) ?? id
-+  const remaining = options.filter(option =>
-+    !preference.some(id => id.toLowerCase() === option.id.toLowerCase()))
++/**
++ * Ordered locale preference. The first registered entry is the active locale;
++ * later entries answer missing keys before the fallback chain and the raw key.
++ * A stored string is the legacy one-element form of the same value.
++ */
++export type LocalePreference = readonly LocaleId[]
 +
-+  const move = (index: number, delta: number): void => {
-+    const target = index + delta
-+    if (target < 0 || target >= preference.length) return
-+    const next = [...preference]
-+    const [entry] = next.splice(index, 1)
-+    next.splice(target, 0, entry)
-+    setPreferences(next)
++/**
++ * Normalize a stored preference to an ordered, duplicate-free list. A stored
++ * string is read as a one-element list; null and undefined stay absent.
++ * @param value - stored preference (legacy string, ordered list, null or undefined).
++ * @returns the normalized list, or undefined when nothing is stored.
++ */
++export function normalizeLocalePreference(
++  value: string | readonly string[] | null | undefined,
++): LocalePreference | undefined {
++  if (value === null || value === undefined) return undefined
++  const list = typeof value === 'string' ? [value] : value
++  const seen = new Set<string>()
++  const normalized: LocaleId[] = []
++  for (const id of list) {
++    const key = id.toLowerCase()
++    if (seen.has(key)) continue
++    seen.add(key)
++    normalized.push(id)
 +  }
- 
-   return (
-     <div className={css.row}>
-       <div className={css.rowText}>
-         <div className={css.title}>{t('language.title')}</div>
-+        <div className={css.hint}>{t('language.hint')}</div>
-+        <ol className={css.list}>
-+          {preference.map((id, index) => (
-+            <li key={id} className={css.preferenceRow}>
-+              <span className={css.preferenceLabel}>{label(id)}</span>
-+              <span className={css.controls}>
-+                <button
-+                  type="button"
-+                  className={css.control}
-+                  aria-label={t('language.moveUp')}
-+                  disabled={index === 0}
-+                  onClick={() => { move(index, -1) }}
-+                >
-+                  ↑
-+                </button>
-+                <button
-+                  type="button"
-+                  className={css.control}
-+                  aria-label={t('language.moveDown')}
-+                  disabled={index === preference.length - 1}
-+                  onClick={() => { move(index, 1) }}
-+                >
-+                  ↓
-+                </button>
-+                <button
-+                  type="button"
-+                  className={css.control}
-+                  aria-label={t('language.remove')}
-+                  disabled={preference.length === 1}
-+                  onClick={() => {
-+                    setPreferences(preference.filter((_, entryIndex) => entryIndex !== index))
-+                  }}
-+                >
-+                  ×
-+                </button>
-+              </span>
-+            </li>
-+          ))}
-+        </ol>
-       </div>
--      <Menu
--        open={open}
--        onClose={() => { setOpen(false) }}
--        items={options.map(o => ({ id: o.id, label: o.label }))}
--        selectedId={active}
--        onSelect={(id) => {
--          setLocale(id)
--          setOpen(false)
--        }}
--        align="end"
--        portal
--        anchor={(
--          <button
--            type="button"
--            className={css.selector}
--            aria-haspopup="menu"
--            aria-expanded={open}
--            onClick={() => { setOpen(v => !v) }}
--          >
--            {activeLabel}
--            <IconChevronDownOutlineRegular className={css.chevron} />
--          </button>
--        )}
--      />
-+      {remaining.length > 0 && (
-+        <Menu
-+          open={open}
-+          onClose={() => { setOpen(false) }}
-+          items={remaining.map(option => ({ id: option.id, label: option.label }))}
-+          onSelect={(id) => {
-+            setPreferences([...preference, id])
-+            setOpen(false)
-+          }}
-+          align="end"
-+          portal
-+          anchor={(
-+            <button
-+              type="button"
-+              className={css.selector}
-+              aria-haspopup="menu"
-+              aria-expanded={open}
-+              onClick={() => { setOpen(v => !v) }}
-+            >
-+              {t('language.add')}
-+              <IconChevronDownOutlineRegular className={css.chevron} />
-+            </button>
-+          )}
-+        />
-+      )}
-     </div>
-   )
++  return normalized.length === 0 ? undefined : Object.freeze(normalized)
++}
++
+ /** Durable locale section shared by the Host schema and the browser scope. */
+ export interface LocaleSettings {
+-  /** Explicit locale selection; absence delegates to the browser. */
+-  preference?: LocaleId
++  /**
++   * Ordered locale preference; absence delegates to the browser. The legacy
++   * string form remains accepted so existing profiles keep loading.
++   */
++  preference?: LocaleId | LocalePreference
  }
++
++/** One accepted locale id. */
++const LocaleIdField = z.string().pattern(LOCALE_ID_PATTERN)
+ 
+ /** Durable locale schema; also the wire envelope the browser scope validates against. */
+ export const LocaleSettingsFields = {
+-  [LOCALE_PREFERENCE_FIELD]: z.string().pattern(LOCALE_ID_PATTERN).required(false),
++  [LOCALE_PREFERENCE_FIELD]: z.union([LocaleIdField, z.array(LocaleIdField)]).required(false),
+ }
+ 
+ /** Schema for the shared locale preference. */
+--- a/packages/client/locale/src/index.ts
++++ b/packages/client/locale/src/index.ts
+@@ -9,14 +9,14 @@
+ import { LocaleSettingsFields } from './locale-settings.ts'
+ 
+ export {
+-  LOCALE_IDS, LOCALE_PREFERENCE_FIELD, LOCALE_SETTINGS_NAMESPACE,
+-  type BuiltInLocaleId, type LocaleId, type LocaleSettings,
++  LOCALE_IDS, LOCALE_PREFERENCE_FIELD, LOCALE_SETTINGS_NAMESPACE, normalizeLocalePreference,
++  type BuiltInLocaleId, type LocaleId, type LocalePreference, type LocaleSettings,
+ } from './locale-settings.ts'
+ 
+ /** Runtime preferences projected to the browser. */
+ export interface Config {
+-  /** Explicit locale; omission follows the browser. */
+-  preference: Volatile<string | undefined>
++  /** Ordered locale preference; omission follows the browser. */
++  preference: Volatile<string | readonly string[] | undefined>
+ }
+ 
+ /** Live preferences projected to the browser. */
 --- a/packages/client/locale/src/client/bootstrap.ts
 +++ b/packages/client/locale/src/client/bootstrap.ts
 @@ -4,8 +4,8 @@
@@ -265,16 +118,14 @@
  }
 --- a/packages/client/locale/src/client/index.ts
 +++ b/packages/client/locale/src/client/index.ts
-@@ -18,7 +18,8 @@
+@@ -18,6 +18,7 @@
  import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
  import {
    LOCALE_ID_PATTERN, LOCALE_IDS, LOCALE_PREFERENCE_FIELD, LOCALE_SETTINGS_NAMESPACE,
--  type BuiltInLocaleId, type LocaleId, type LocaleSettings,
 +  normalizeLocalePreference,
-+  type BuiltInLocaleId, type LocaleId, type LocalePreference, type LocaleSettings,
+   type BuiltInLocaleId, type LocaleId, type LocaleSettings,
  } from '../locale-settings.ts'
  import { en, ja, es, fr, de, ru, pt, zh, type CommonKey } from '../locales/index.ts'
- import {
 @@ -73,11 +74,13 @@
  
  /** Immutable locale state published on every change. */
@@ -660,92 +511,240 @@
          d.options = options
          d.revision = revision
        },
---- a/packages/client/locale/src/index.ts
-+++ b/packages/client/locale/src/index.ts
-@@ -9,14 +9,14 @@
- import { LocaleSettingsFields } from './locale-settings.ts'
+--- a/packages/client/locale/src/client/LanguageRow.tsx
++++ b/packages/client/locale/src/client/LanguageRow.tsx
+@@ -1,8 +1,11 @@
+ /**
+  * Language preference row registered into the General section item slot
+- * (figma 501:30011 'Setting-Cell'): title + selector pill opening the locale
+- * menu. Registered by this package — the locale feature owns its own
+- * settings surface.
++ * (figma 501:30011 'Setting-Cell'): title + ordered preference list plus an
++ * "add language" menu. Registered by this package — the locale feature owns
++ * its own settings surface.
++ *
++ * The first entry is the active interface language; later entries answer
++ * missing strings before English and the raw key (browser-style preference).
+  */
+ import { useState } from 'react'
+ import type { PropsLocale, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
+@@ -11,10 +14,12 @@
+ import type { createLanguageRowStore } from './settings-store.ts'
+ import css from './LanguageRow.module.css'
  
- export {
--  LOCALE_IDS, LOCALE_PREFERENCE_FIELD, LOCALE_SETTINGS_NAMESPACE,
--  type BuiltInLocaleId, type LocaleId, type LocaleSettings,
-+  LOCALE_IDS, LOCALE_PREFERENCE_FIELD, LOCALE_SETTINGS_NAMESPACE, normalizeLocalePreference,
-+  type BuiltInLocaleId, type LocaleId, type LocalePreference, type LocaleSettings,
- } from './locale-settings.ts'
- 
- /** Runtime preferences projected to the browser. */
- export interface Config {
--  /** Explicit locale; omission follows the browser. */
--  preference: Volatile<string | undefined>
-+  /** Ordered locale preference; omission follows the browser. */
-+  preference: Volatile<string | readonly string[] | undefined>
+-/** Injected business face: the preference write (t rides the standard locale seat). */
++/** Injected business face: the preference writes (t rides the standard locale seat). */
+ export interface LanguageRowInjected {
+-  /** Switch the active locale (a registered locale id). */
++  /** Switch to one locale (legacy single-selection entry point). */
+   setLocale: (id: string) => void
++  /** Replace the ordered locale preference. */
++  setPreferences: (ids: readonly string[]) => void
  }
  
- /** Live preferences projected to the browser. */
---- a/packages/client/locale/src/locale-settings.ts
-+++ b/packages/client/locale/src/locale-settings.ts
-@@ -5,7 +5,7 @@
- /** Settings namespace owned by the locale plugin. */
- export const LOCALE_SETTINGS_NAMESPACE = 'locale'
- 
--/** Field carrying an explicit locale selection; absence delegates to the browser. */
-+/** Field carrying an explicit ordered locale preference; absence delegates to the browser. */
- export const LOCALE_PREFERENCE_FIELD = 'preference'
- 
- /** Accepted BCP 47-style language ids. */
-@@ -20,15 +20,50 @@
- /** Open locale identifier accepted from language-pack plugins. */
- export type LocaleId = string
- 
-+/**
-+ * Ordered locale preference. The first registered entry is the active locale;
-+ * later entries answer missing keys before the fallback chain and the raw key.
-+ * A stored string is the legacy one-element form of the same value.
-+ */
-+export type LocalePreference = readonly LocaleId[]
+ /** Full component props: runtime share + store share + locale seat + injected face. */
+@@ -27,41 +32,94 @@
+  * @param props - composed slot props.
+  * @returns the row element tree.
+  */
+-export function LanguageRow({ t, setLocale, useStore }: LanguageRowComponentProps) {
+-  const active = useStore(s => s.active)
++export function LanguageRow({ t, setPreferences, useStore }: LanguageRowComponentProps) {
++  const preference = useStore(s => s.preference)
+   const options = useStore(s => s.options)
+   const [open, setOpen] = useState(false)
+-  const activeLabel = options.find(o => o.id === active)?.label ?? active
++  const labels = new Map(options.map(option => [option.id.toLowerCase(), option.label]))
++  const label = (id: string): string => labels.get(id.toLowerCase()) ?? id
++  const remaining = options.filter(option =>
++    !preference.some(id => id.toLowerCase() === option.id.toLowerCase()))
 +
-+/**
-+ * Normalize a stored preference to an ordered, duplicate-free list. A stored
-+ * string is read as a one-element list; null and undefined stay absent.
-+ * @param value - stored preference (legacy string, ordered list, null or undefined).
-+ * @returns the normalized list, or undefined when nothing is stored.
-+ */
-+export function normalizeLocalePreference(
-+  value: string | readonly string[] | null | undefined,
-+): LocalePreference | undefined {
-+  if (value === null || value === undefined) return undefined
-+  const list = typeof value === 'string' ? [value] : value
-+  const seen = new Set<string>()
-+  const normalized: LocaleId[] = []
-+  for (const id of list) {
-+    const key = id.toLowerCase()
-+    if (seen.has(key)) continue
-+    seen.add(key)
-+    normalized.push(id)
++  const move = (index: number, delta: number): void => {
++    const target = index + delta
++    if (target < 0 || target >= preference.length) return
++    const next = [...preference]
++    const [entry] = next.splice(index, 1)
++    if (entry === undefined) return
++    next.splice(target, 0, entry)
++    setPreferences(next)
 +  }
-+  return normalized.length === 0 ? undefined : Object.freeze(normalized)
+ 
+   return (
+     <div className={css.row}>
+       <div className={css.rowText}>
+         <div className={css.title}>{t('language.title')}</div>
++        <div className={css.hint}>{t('language.hint')}</div>
++        <ol className={css.list}>
++          {preference.map((id, index) => (
++            <li key={id} className={css.preferenceRow}>
++              <span className={css.preferenceLabel}>{label(id)}</span>
++              <span className={css.controls}>
++                <button
++                  type="button"
++                  className={css.control}
++                  aria-label={t('language.moveUp')}
++                  disabled={index === 0}
++                  onClick={() => { move(index, -1) }}
++                >
++                  ↑
++                </button>
++                <button
++                  type="button"
++                  className={css.control}
++                  aria-label={t('language.moveDown')}
++                  disabled={index === preference.length - 1}
++                  onClick={() => { move(index, 1) }}
++                >
++                  ↓
++                </button>
++                <button
++                  type="button"
++                  className={css.control}
++                  aria-label={t('language.remove')}
++                  disabled={preference.length === 1}
++                  onClick={() => {
++                    setPreferences(preference.filter((_, entryIndex) => entryIndex !== index))
++                  }}
++                >
++                  ×
++                </button>
++              </span>
++            </li>
++          ))}
++        </ol>
+       </div>
+-      <Menu
+-        open={open}
+-        onClose={() => { setOpen(false) }}
+-        items={options.map(o => ({ id: o.id, label: o.label }))}
+-        selectedId={active}
+-        onSelect={(id) => {
+-          setLocale(id)
+-          setOpen(false)
+-        }}
+-        align="end"
+-        portal
+-        anchor={(
+-          <button
+-            type="button"
+-            className={css.selector}
+-            aria-haspopup="menu"
+-            aria-expanded={open}
+-            onClick={() => { setOpen(v => !v) }}
+-          >
+-            {activeLabel}
+-            <IconChevronDownOutlineRegular className={css.chevron} />
+-          </button>
+-        )}
+-      />
++      {remaining.length > 0 && (
++        <Menu
++          open={open}
++          onClose={() => { setOpen(false) }}
++          items={remaining.map(option => ({ id: option.id, label: option.label }))}
++          onSelect={(id) => {
++            setPreferences([...preference, id])
++            setOpen(false)
++          }}
++          align="end"
++          portal
++          anchor={(
++            <button
++              type="button"
++              className={css.selector}
++              aria-haspopup="menu"
++              aria-expanded={open}
++              onClick={() => { setOpen(v => !v) }}
++            >
++              {t('language.add')}
++              <IconChevronDownOutlineRegular className={css.chevron} />
++            </button>
++          )}
++        />
++      )}
+     </div>
+   )
+ }
+--- a/packages/client/locale/src/client/LanguageRow.module.css
++++ b/packages/client/locale/src/client/LanguageRow.module.css
+@@ -3,7 +3,7 @@
+ 
+ .row {
+   display: flex;
+-  align-items: center;
++  align-items: flex-start;
+   gap: 8px;
+   padding: 16px 0;
+   border-bottom: 0.5px solid var(--dsw-alias-border-l2);
+@@ -33,6 +33,68 @@
+   color: var(--dsw-alias-label-primary);
+ }
+ 
++.hint {
++  font-size: 12px;
++  line-height: 18px;
++  color: var(--dsw-alias-label-secondary);
 +}
 +
- /** Durable locale section shared by the Host schema and the browser scope. */
- export interface LocaleSettings {
--  /** Explicit locale selection; absence delegates to the browser. */
--  preference?: LocaleId
-+  /**
-+   * Ordered locale preference; absence delegates to the browser. The legacy
-+   * string form remains accepted so existing profiles keep loading.
-+   */
-+  preference?: LocaleId | LocalePreference
- }
++.list {
++  display: flex;
++  flex-direction: column;
++  gap: 4px;
++  margin: 4px 0 0;
++  padding: 0;
++  list-style: none;
++}
 +
-+/** One accepted locale id. */
-+const LocaleIdField = z.string().pattern(LOCALE_ID_PATTERN)
- 
- /** Durable locale schema; also the wire envelope the browser scope validates against. */
- export const LocaleSettingsFields = {
--  [LOCALE_PREFERENCE_FIELD]: z.string().pattern(LOCALE_ID_PATTERN).required(false),
-+  [LOCALE_PREFERENCE_FIELD]: z.union([LocaleIdField, z.array(LocaleIdField)]).required(false),
- }
- 
- /** Schema for the shared locale preference. */
++.preferenceRow {
++  display: flex;
++  align-items: center;
++  gap: 8px;
++  min-height: 32px;
++}
++
++.preferenceLabel {
++  flex: 1;
++  min-width: 0;
++  font-size: 14px;
++  line-height: 22px;
++  color: var(--dsw-alias-label-primary);
++}
++
++.controls {
++  display: inline-flex;
++  align-items: center;
++  gap: 4px;
++}
++
++.control {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  width: 28px;
++  height: 28px;
++  padding: 0;
++  border: none;
++  border-radius: var(--dsw-radius-md);
++  background: var(--dsw-alias-bg-module-platform);
++  font: inherit;
++  font-size: 14px;
++  line-height: 1;
++  color: var(--dsw-alias-label-primary);
++  cursor: pointer;
++}
++
++.control:hover:enabled {
++  background: var(--dsw-alias-interactive-bg-hover);
++}
++
++.control:disabled {
++  opacity: 0.4;
++  cursor: default;
++}
++
+ /* Language selector uses the standard control size. */
+ .selector {
+   display: inline-flex;
 --- a/packages/client/locale/src/locales/settings.ts
 +++ b/packages/client/locale/src/locales/settings.ts
 @@ -3,6 +3,11 @@
@@ -830,121 +829,6 @@
 +  'language.moveDown': 'Mover para baixo',
 +  'language.remove': 'Remover',
  } satisfies Record<keyof typeof en, string>
---- a/packages/client/locale/tests/language-row.client.spec.tsx
-+++ b/packages/client/locale/tests/language-row.client.spec.tsx
-@@ -19,6 +19,15 @@
- 
- const OPTIONS = [{ id: 'zh', label: '中文' }, { id: 'en', label: 'English' }]
- 
-+const COPY: Record<string, string> = {
-+  'language.title': 'Language',
-+  'language.hint': 'Tried in order for missing text.',
-+  'language.add': 'Add language',
-+  'language.moveUp': 'Move up',
-+  'language.moveDown': 'Move down',
-+  'language.remove': 'Remove',
-+}
-+
- function emptySessions() {
-   const store = createSnapshotStore<SessionListState>(
-     { ids: [], byId: {}, phase: 'ready', projectionsBySession: {} })
-@@ -35,11 +44,12 @@
- const noAttention: AttentionSnapshot = new Map()
- const useSessionStatus: LanguageRowComponentProps['useSessionStatus'] = selector => selector(noAttention)
- 
--function mount(active = 'en') {
-+function mount(preference = ['en'], active = 'en') {
-   // Real store instance — the sanctioned zero-machinery path for tests.
-   const store = createLanguageRowStore().create()
--  store.actions.sync(active, OPTIONS, 0)
-+  store.actions.sync(active, preference, OPTIONS, 0)
-   const setLocale = vi.fn()
-+  const setPreferences = vi.fn()
-   const props: LanguageRowComponentProps = {
-     useSessions: emptySessions(),
-     useSessionStatus,
-@@ -49,46 +59,53 @@
-     useContextMenu: contextMenuHook(),
-     useStore: bindSnapshotSelector(store),
-     actions: store.actions,
--    t: (key: string) => key === 'language.title' ? 'Language' : key,
-+    t: (key: string) => COPY[key] ?? key,
-     setLocale,
-+    setPreferences,
-   }
-   render(<LanguageRow {...props} />)
--  return { store, setLocale }
-+  return { store, setLocale, setPreferences }
- }
- 
- describe('LanguageRow', () => {
--  it('shows the title and the active locale label on the selector pill', () => {
--    mount('en')
-+  it('shows the title, hint, and one row per preferred language', () => {
-+    mount(['en', 'zh'])
-     expect(screen.getByText('Language')).toBeDefined()
--    const trigger = screen.getByRole('button', { name: /English/ })
--    expect(trigger.getAttribute('aria-expanded')).toBe('false')
-+    expect(screen.getByText('English')).toBeDefined()
-+    expect(screen.getByText('中文')).toBeDefined()
-+    expect(screen.getByRole('button', { name: 'Add language' })).toBeDefined()
-   })
- 
--  it('opens the menu, selects a locale, and closes', () => {
--    const b = mount('en')
--    const trigger = screen.getByRole('button', { name: /English/ })
--    fireEvent.click(trigger)
--    expect(trigger.getAttribute('aria-expanded')).toBe('true')
-+  it('moves an entry up and down within the preference list', () => {
-+    const b = mount(['en', 'zh'])
-+    const down = screen.getAllByRole('button', { name: 'Move down' })
-+    fireEvent.click(down[0]!)
-+    expect(b.setPreferences).toHaveBeenLastCalledWith(['zh', 'en'])
-+    const up = screen.getAllByRole('button', { name: 'Move up' })
-+    fireEvent.click(up[1]!)
-+    expect(b.setPreferences).toHaveBeenLastCalledWith(['en', 'zh'])
-+  })
-+
-+  it('removes a non-last entry but never the last one', () => {
-+    const b = mount(['en', 'zh'])
-+    fireEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0]!)
-+    expect(b.setPreferences).toHaveBeenLastCalledWith(['zh'])
-+    cleanup()
-+    mount(['en'])
-+    expect(screen.getByRole('button', { name: 'Remove' })).toBeDisabled()
-+  })
-+
-+  it('adds a remaining language through the menu', () => {
-+    const b = mount(['en'])
-+    fireEvent.click(screen.getByRole('button', { name: 'Add language' }))
-     fireEvent.click(screen.getByRole('menuitem', { name: '中文' }))
--    expect(b.setLocale).toHaveBeenCalledWith('zh')
--    expect(trigger.getAttribute('aria-expanded')).toBe('false')
-+    expect(b.setPreferences).toHaveBeenLastCalledWith(['en', 'zh'])
-     expect(screen.queryByRole('menuitem', { name: '中文' })).toBeNull()
-   })
- 
--  it('closes on outside pointerdown without selecting', () => {
--    const b = mount('en')
--    fireEvent.click(screen.getByRole('button', { name: /English/ }))
--    expect(screen.getByRole('menuitem', { name: '中文' })).toBeDefined()
--    fireEvent.pointerDown(document.body)
--    expect(screen.queryByRole('menuitem', { name: '中文' })).toBeNull()
--    expect(b.setLocale).not.toHaveBeenCalled()
--  })
--
--  it('follows store changes; an unknown active id falls back to the id itself', () => {
--    const b = mount('en')
--    act(() => { b.store.actions.sync('zh', OPTIONS, 1) })
--    expect(screen.getByRole('button', { name: /中文/ })).toBeDefined()
--    act(() => { b.store.actions.sync('fr', OPTIONS, 2) })
--    expect(screen.getByRole('button', { name: /fr/ })).toBeDefined()
-+  it('follows store changes; an unknown id falls back to the id itself', () => {
-+    const b = mount(['en'])
-+    act(() => { b.store.actions.sync('fr', ['fr'], OPTIONS, 1) })
-+    expect(screen.getByText('fr')).toBeDefined()
-   })
- })
 --- /dev/null
 +++ b/packages/client/locale/tests/ordered-preference.client.spec.ts
 @@ -0,0 +1,127 @@
@@ -1075,6 +959,126 @@
 +    expect(svc.getLocale().preference).toEqual(['en', 'zh'])
 +  })
 +})
+--- a/packages/client/locale/tests/language-row.client.spec.tsx
++++ b/packages/client/locale/tests/language-row.client.spec.tsx
+@@ -19,6 +19,15 @@
+ 
+ const OPTIONS = [{ id: 'zh', label: '中文' }, { id: 'en', label: 'English' }]
+ 
++const COPY: Record<string, string> = {
++  'language.title': 'Language',
++  'language.hint': 'Tried in order for missing text.',
++  'language.add': 'Add language',
++  'language.moveUp': 'Move up',
++  'language.moveDown': 'Move down',
++  'language.remove': 'Remove',
++}
++
+ function emptySessions() {
+   const store = createSnapshotStore<SessionListState>(
+     { ids: [], byId: {}, phase: 'ready', projectionsBySession: {} })
+@@ -35,11 +44,12 @@
+ const noAttention: AttentionSnapshot = new Map()
+ const useSessionStatus: LanguageRowComponentProps['useSessionStatus'] = selector => selector(noAttention)
+ 
+-function mount(active = 'en') {
++function mount(preference = ['en'], active = 'en') {
+   // Real store instance — the sanctioned zero-machinery path for tests.
+   const store = createLanguageRowStore().create()
+-  store.actions.sync(active, OPTIONS, 0)
++  store.actions.sync(active, preference, OPTIONS, 0)
+   const setLocale = vi.fn()
++  const setPreferences = vi.fn()
+   const props: LanguageRowComponentProps = {
+     useSessions: emptySessions(),
+     useSessionStatus,
+@@ -49,46 +59,58 @@
+     useContextMenu: contextMenuHook(),
+     useStore: bindSnapshotSelector(store),
+     actions: store.actions,
+-    t: (key: string) => key === 'language.title' ? 'Language' : key,
++    t: (key: string) => COPY[key] ?? key,
+     setLocale,
++    setPreferences,
+   }
+   render(<LanguageRow {...props} />)
+-  return { store, setLocale }
++  return { store, setLocale, setPreferences }
+ }
+ 
+ describe('LanguageRow', () => {
+-  it('shows the title and the active locale label on the selector pill', () => {
+-    mount('en')
++  it('shows the title, hint, and one row per preferred language', () => {
++    mount(['en'])
+     expect(screen.getByText('Language')).toBeDefined()
+-    const trigger = screen.getByRole('button', { name: /English/ })
+-    expect(trigger.getAttribute('aria-expanded')).toBe('false')
++    expect(screen.getByText('English')).toBeDefined()
++    expect(screen.queryByText('中文')).toBeNull()
++    expect(screen.getByRole('button', { name: 'Add language' })).toBeDefined()
+   })
+ 
+-  it('opens the menu, selects a locale, and closes', () => {
+-    const b = mount('en')
+-    const trigger = screen.getByRole('button', { name: /English/ })
+-    fireEvent.click(trigger)
+-    expect(trigger.getAttribute('aria-expanded')).toBe('true')
++  it('moves an entry down within the preference list', () => {
++    const b = mount(['en', 'zh'])
++    const down = screen.getAllByRole('button', { name: 'Move down' })
++    fireEvent.click(down[0]!)
++    expect(b.setPreferences).toHaveBeenLastCalledWith(['zh', 'en'])
++  })
++
++  it('moves an entry up within the preference list', () => {
++    const b = mount(['zh', 'en'])
++    const up = screen.getAllByRole('button', { name: 'Move up' })
++    fireEvent.click(up[1]!)
++    expect(b.setPreferences).toHaveBeenLastCalledWith(['en', 'zh'])
++  })
++
++  it('removes a non-last entry but never the last one', () => {
++    const b = mount(['en', 'zh'])
++    fireEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0]!)
++    expect(b.setPreferences).toHaveBeenLastCalledWith(['zh'])
++    cleanup()
++    mount(['en'])
++    const button = screen.getByRole('button', { name: 'Remove' }) as HTMLButtonElement
++    expect(button.disabled).toBe(true)
++  })
++
++  it('adds a remaining language through the menu', () => {
++    const b = mount(['en'])
++    fireEvent.click(screen.getByRole('button', { name: 'Add language' }))
+     fireEvent.click(screen.getByRole('menuitem', { name: '中文' }))
+-    expect(b.setLocale).toHaveBeenCalledWith('zh')
+-    expect(trigger.getAttribute('aria-expanded')).toBe('false')
++    expect(b.setPreferences).toHaveBeenLastCalledWith(['en', 'zh'])
+     expect(screen.queryByRole('menuitem', { name: '中文' })).toBeNull()
+   })
+ 
+-  it('closes on outside pointerdown without selecting', () => {
+-    const b = mount('en')
+-    fireEvent.click(screen.getByRole('button', { name: /English/ }))
+-    expect(screen.getByRole('menuitem', { name: '中文' })).toBeDefined()
+-    fireEvent.pointerDown(document.body)
+-    expect(screen.queryByRole('menuitem', { name: '中文' })).toBeNull()
+-    expect(b.setLocale).not.toHaveBeenCalled()
+-  })
+-
+-  it('follows store changes; an unknown active id falls back to the id itself', () => {
+-    const b = mount('en')
+-    act(() => { b.store.actions.sync('zh', OPTIONS, 1) })
+-    expect(screen.getByRole('button', { name: /中文/ })).toBeDefined()
+-    act(() => { b.store.actions.sync('fr', OPTIONS, 2) })
+-    expect(screen.getByRole('button', { name: /fr/ })).toBeDefined()
++  it('follows store changes; an unknown id falls back to the id itself', () => {
++    const b = mount(['en'])
++    act(() => { b.store.actions.sync('fr', ['fr'], OPTIONS, 1) })
++    expect(screen.getByText('fr')).toBeDefined()
+   })
+ })
 --- a/packages/client/locale/tests/settings-store.client.spec.ts
 +++ b/packages/client/locale/tests/settings-store.client.spec.ts
 @@ -7,24 +7,26 @@
@@ -1113,3 +1117,87 @@
      expect(store.getSnapshot().revision).toBe(5)
    })
  })
+--- a/packages/client/locale/tests/apply.client.spec.ts
++++ b/packages/client/locale/tests/apply.client.spec.ts
+@@ -104,7 +104,7 @@
+       expect(onChange).toHaveBeenLastCalledWith('en')
+       await fiber.dispose()
+       const calls = onChange.mock.calls.length
+-      b.ctx.emit('locale/change', { active: 'zh', locales: [], revision: 99 })
++      b.ctx.emit('locale/change', { active: 'zh', preference: ['zh'], locales: [], revision: 99 })
+       expect(onChange).toHaveBeenCalledTimes(calls)
+     } finally {
+       ready.resolve({ languages: ['en-US'], preference: 'zh' })
+--- a/packages/client/ui-input-trigger/tests/service.client.spec.ts
++++ b/packages/client/ui-input-trigger/tests/service.client.spec.ts
+@@ -259,7 +259,7 @@
+     })
+ 
+     locale = 'zh'
+-    root.emit('locale/change', { active: 'zh', locales: [], revision: 1 } as LocaleSnapshot)
++    root.emit('locale/change', { active: 'zh', preference: ['zh'], locales: [], revision: 1 } as LocaleSnapshot)
+     expect(first.menu.getSnapshot().open).toBe(true)
+     expect(second.menu.getSnapshot().open).toBe(true)
+     await tick()
+--- a/packages/client/ui-plugin-manager/tests/components.client.spec.tsx
++++ b/packages/client/ui-plugin-manager/tests/components.client.spec.tsx
+@@ -174,7 +174,7 @@
+     useConfigLedger: bindSnapshotSelector(ledger),
+     usePluginTabs: bindSnapshotSelector(tabLedger),
+     useBundleDetails: bindSnapshotSelector(bundleDetails),
+-    useLocale: bindSnapshotSelector(createSnapshotStore<LocaleSnapshot>({ active: 'en', locales: [], revision: 0 })),
++    useLocale: bindSnapshotSelector(createSnapshotStore<LocaleSnapshot>({ active: 'en', preference: ['en'], locales: [], revision: 0 })),
+     useConfigurations: bindSnapshotSelector(createSnapshotStore<SettingsMirrorSnapshot>({
+       status: 'ready', error: null,
+       view: { writable: true, hasDocument: true, namespaces: Object.keys(forms).map(ns => ({
+--- a/packages/client/ui-plugin-market/tests/discover.client.spec.tsx
++++ b/packages/client/ui-plugin-market/tests/discover.client.spec.tsx
+@@ -81,7 +81,7 @@
+ function renderTab(state: Partial<DiscoverState> = {}, dictionary: Record<PluginMarketLocaleKey, string> = en) {
+   const store = createSnapshotStore<DiscoverState>({ ...READY, ...state })
+   const language = dictionary === en ? 'en' : 'zh'
+-  const locale = createSnapshotStore<LocaleSnapshot>({ active: language, locales: [], revision: 0 })
++  const locale = createSnapshotStore<LocaleSnapshot>({ active: language, preference: [language], locales: [], revision: 0 })
+   const actions = {
+     ensure: vi.fn(), reload: vi.fn(), select: vi.fn(), search: vi.fn(), more: vi.fn(), refresh: vi.fn(), retry: vi.fn(),
+     toggleSources: vi.fn(),
+--- a/packages/client/ui-plugin-market/tests/plugin-detail.client.spec.tsx
++++ b/packages/client/ui-plugin-market/tests/plugin-detail.client.spec.tsx
+@@ -24,7 +24,7 @@
+ 
+ function setup(initial: DetailsState = {}, language = 'en') {
+   const details = createSnapshotStore<DetailsState>(initial)
+-  const locale = createSnapshotStore<LocaleSnapshot>({ active: language, locales: [], revision: 0 })
++  const locale = createSnapshotStore<LocaleSnapshot>({ active: language, preference: [language], locales: [], revision: 0 })
+   const face = {
+     loadDetail: vi.fn(), retryDetail: vi.fn(),
+     detailImage: vi.fn((document: PluginDetailDocumentId, destination: string) => `https://dsh.example/api/plugin-market/detail-file?document=${document}&path=${destination}`),
+@@ -47,7 +47,7 @@
+   // Relative links stay text.
+   expect(screen.queryByRole('link', { name: 'guide' })).toBeNull()
+   expect(screen.getByText('guide')).toBeTruthy()
+-  act(() => { locale.set({ active: 'zh', locales: [], revision: 1 }) })
++  act(() => { locale.set({ active: 'zh', preference: ['zh'], locales: [], revision: 1 }) })
+   expect(face.loadDetail).toHaveBeenLastCalledWith(REQUEST, 'zh')
+   view.rerender(<PluginDetailSection request={REQUEST} t={translator(zh)} {...face} />)
+   expect(face.loadDetail).toHaveBeenCalledTimes(2)
+--- a/packages/experimental/client-ui-cot-translation/tests/translation-body.client.spec.tsx
++++ b/packages/experimental/client-ui-cot-translation/tests/translation-body.client.spec.tsx
+@@ -15,7 +15,7 @@
+ 
+ function fixture(text = 'Original paragraph') {
+   const preferences = createSnapshotStore<CotTranslationPreferences>({ provider: 'google', targetLanguage: 'auto' })
+-  const locale = createSnapshotStore<LocaleSnapshot>({ active: 'zh', locales: [], revision: 0 })
++  const locale = createSnapshotStore<LocaleSnapshot>({ active: 'zh', preference: ['zh'], locales: [], revision: 0 })
+   const translationLimit = createSnapshotStore(4000)
+   const translate = vi.fn<TranslateText>(async request => `${request.provider}:${request.targetLanguage}:${request.text}`)
+   const props = { rawText: 'Raw model reasoning', text, running: false, translate, renderFactorySlot, t: makeTranslate(en),
+@@ -51,7 +51,7 @@
+   first.resolve('outdated translation')
+   await act(async () => { await first.promise })
+   expect(view.queryByText('outdated translation')).toBeNull()
+-  act(() => { b.locale.set({ active: 'en', locales: [], revision: 1 }) })
++  act(() => { b.locale.set({ active: 'en', preference: ['en'], locales: [], revision: 1 }) })
+   expect(b.translate).toHaveBeenCalledTimes(2)
+   act(() => { b.preferences.set({ provider: 'bing', targetLanguage: 'auto' }) })
+   await view.findByText('bing:en:Original paragraph')
