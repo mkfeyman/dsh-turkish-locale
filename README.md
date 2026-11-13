@@ -10,8 +10,8 @@ no changes to the packaged application, no rebuild.
 
 - Registers `tr` with an `en` fallback through `ctx.locale.addLanguage` and
   `ctx.locale.register`.
-- Translates **73 namespaces / 3,838 strings** — 100% of the English UI copy
-  shipped in DSH **0.2.2-rc.1** (commit `c59d10a`; v1.1.0). Placeholders,
+- Translates **75 namespaces / 4,223 strings** — 100% of the English UI copy
+  shipped in DSH **0.2.2-rc.2** (commit `a6b1b85`; v1.1.1). Placeholders,
   Markdown, separator strings and punctuation are preserved and validated
   against source.
 - The language appears in **Settings → General → Language → Türkçe**; the choice
@@ -63,19 +63,25 @@ available to pnpm on the machine.
 
 ## Compatibility
 
-- Verified working on **DSH 0.2.2-rc.1** (commit `c59d10a`): the pack loads from
-  the boot graph, the selector lists 8 built-in languages plus Türkçe, switching
-  round-trips, and `locale.preference: tr` persists. Runtime contracts
-  (`addLanguage`, `register(ns, locale, dict)`, `resolveText`, snapshot) are
-  unchanged from 0.2.1-rc.3. See
+- Verified working on **DSH 0.2.2-rc.2** (commit `a6b1b85`): the pack loads from
+  the boot graph, the language selector lists the built-in languages plus
+  Türkçe, switching round-trips, and `locale.preference: tr` persists. Runtime
+  contracts (`addLanguage`, `register(ns, locale, dict)`, `resolveText`,
+  snapshot) are unchanged from 0.2.1-rc.3.
+- **0.2.2-rc.2 profile note:** profile `node_modules` is now pnpm-managed, so a
+  hand-copied directory is no longer mounted by the Loader. Install through
+  **Plugins** (`install_bundle` on this directory), or from the market index;
+  a `remove_bundle` + `install_bundle` cycle re-links an older manual install.
+- **Coverage (v1.1.1):** re-extracted from 0.2.2-rc.2 and translated to
+  **75 namespaces / 4,223 strings — 100 %** of the shipped English UI copy,
+  including the 430 strings added by rc.2 (`cuaPermissions` 66, `forgePanel`
+  +174, `settings.models` +37, `sidebarFiles` +32, …); 45 removed strings were
+  pruned and 2 changed placeholders fixed. Release notes:
+  [`docs/release-notes-v1.1.1.md`](docs/release-notes-v1.1.1.md).
+- Earlier: v1.1.0 covers 0.2.2-rc.1 (73/3,838,
+  [`docs/release-notes-v1.1.0.md`](docs/release-notes-v1.1.0.md)); the 0.2.2-rc.1
+  upgrade analysis stays at
   [`docs/upgrade-analysis-0.2.2-rc1.md`](docs/upgrade-analysis-0.2.2-rc1.md).
-- **Coverage (v1.1.0):** re-extracted from 0.2.2-rc.1 and translated to
-  **73 namespaces / 3,838 strings — 100 %** of the shipped English UI copy,
-  including the 981 strings added by 0.2.2 (10 new namespaces:
-  `forgePanel` 253, `liveshare` 225, `stats` 177, …). The 60 changed English
-  source values were reviewed and updated where the meaning moved. Measured
-  delta and fixture notes: [`fixtures/version-coverage.json`](fixtures/version-coverage.json).
-  Release notes: [`docs/release-notes-v1.1.0.md`](docs/release-notes-v1.1.0.md).
 
 ## Repository layout
 
