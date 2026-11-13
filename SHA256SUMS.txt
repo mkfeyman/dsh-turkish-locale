@@ -1,2 +1,3 @@
 86897c993839584869ddc5efcd770b53b661e050a99e2d602e8403e38bcae7ba  dsh-turkish-locale-1.0.0.tgz
 77c7065c138a63b2dfe7b26e8a0bc700dbc44db42e00c0ba38c8a8d65ca4af09  dsh-turkish-locale-1.1.0.tgz
+2e27ae495e4c01d2f8536178eaa5e04a5d4c02206dc7e53c1f417bf7ae2ef68a  dsh-turkish-locale-1.1.1.tgz
