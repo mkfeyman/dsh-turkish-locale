@@ -12,6 +12,12 @@ Three variants are provided:
 | [`0002-ordered-locale-preference-0.2.2.patch`](0002-ordered-locale-preference-0.2.2.patch) | `dsh-v0.2.2-alpha.2` (commit `f3803c96…`) | Kept for comparison; superseded by `0003`. |
 | [`0001-ordered-locale-preference.patch`](0001-ordered-locale-preference.patch) | `dsh-v0.2.1-rc.3` (commit `1f81c047…`) | Kept for the originally installed desktop build and for comparison. |
 
+**0.2.2-rc.2 compatibility:** comparing the `packages/client/locale` trees of
+`dsh-v0.2.2-rc.1` and `dsh-v0.2.2-rc.2` shows a single upstream change —
+`package.json` (version bump). The runtime, settings, row, and test sources are
+identical, so `0003` applies to rc.2 unchanged and the rc.1 validation results
+carry over. The installed rc.2 desktop build reports commit `a6b1b85`.
+
 ## What it changes
 
 `packages/client/locale` only (11 files):
