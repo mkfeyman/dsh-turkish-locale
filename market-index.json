@@ -34,8 +34,8 @@
         "tr": "Türkçe dil paketi"
       },
       "description": {
-        "en": "Adds Turkish to Settings → General → Language: 73 namespaces / 3,838 strings, 100% of the shipped English UI copy (0.2.2-rc.1).",
-        "tr": "Ayarlar → Genel → Dil altına Türkçe ekler: 73 ad alanı / 3.838 dizgi, gönderilen İngilizce arayüzün tamamı (0.2.2-rc.1)."
+        "en": "Adds Turkish to Settings → General → Language: 75 namespaces / 4,223 strings, 100% of the shipped English UI copy (0.2.2-rc.2).",
+        "tr": "Ayarlar → Genel → Dil altına Türkçe ekler: 75 ad alanı / 4.223 dizgi, gönderilen İngilizce arayüzün tamamı (0.2.2-rc.2)."
       },
       "icon": "docs/icon.png",
       "author": "mkfeyman",
@@ -56,16 +56,28 @@
         ]
       },
       "dist-tags": {
-        "latest": "1.1.0"
+        "latest": "1.1.1"
       },
       "versions": [
         {
-          "version": "1.1.0",
-          "publishTimestamp": 1793894437,
+          "version": "1.1.1",
+          "publishTimestamp": 1794582079,
           "source": {
             "type": "git",
             "url": "https://github.com/mkfeyman/dsh-turkish-locale",
-            "commit": "e224d7a42cc50a4515eeed415de275b6ad0f2472"
+            "commit": "78d6cc4a2efc3c160029880a19b19c3e12719bd1"
+          },
+          "engines": {
+            "dsh": ">=0.2.1-rc.3 <0.3.0"
+          }
+        },
+        {
+          "version": "1.1.0",
+          "publishTimestamp": 1794582079,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/mkfeyman/dsh-turkish-locale",
+            "commit": "78d6cc4a2efc3c160029880a19b19c3e12719bd1"
           },
           "engines": {
             "dsh": ">=0.2.1-rc.3 <0.3.0"
@@ -73,11 +85,11 @@
         },
         {
           "version": "1.0.0",
-          "publishTimestamp": 1793894437,
+          "publishTimestamp": 1794582079,
           "source": {
             "type": "git",
             "url": "https://github.com/mkfeyman/dsh-turkish-locale",
-            "commit": "e224d7a42cc50a4515eeed415de275b6ad0f2472"
+            "commit": "78d6cc4a2efc3c160029880a19b19c3e12719bd1"
           },
           "engines": {
             "dsh": ">=0.2.1-rc.3 <0.3.0"
