@@ -1,102 +1,103 @@
-# DSH 0.2.2-rc.1 güncellemesi — Türkçe eklenti analiz ve hata ayıklama raporu
+# DSH 0.2.2-rc.1 update — Turkish plugin analysis and debugging report
 
-**Tarih:** 2026-11-05 · **Ölçülen sürüm:** `0.2.2-rc.1` (commit `c59d10a`, nightly
-kanalı) · **GUI:** `http://127.0.0.1:61914`
+**Date:** 2026-11-05 · **Measured version:** `0.2.2-rc.1` (commit `c59d10a`,
+nightly channel) · **GUI:** `http://127.0.0.1:61914`
 
 ---
 
-## 1. Güncelleme tespiti
+## 1. Update detection
 
-| Öğe | Değer |
+| Item | Value |
 |---|---|
-| Önceki kurulu sürüm | 0.2.1-rc.3 (commit `be72761`) |
-| Yeni kurulu sürüm | **0.2.2-rc.1** (commit `c59d10a`) |
-| Kanal | `nightly` (app-update.yml) |
+| Previously installed version | 0.2.1-rc.3 (commit `be72761`) |
+| Newly installed version | **0.2.2-rc.1** (commit `c59d10a`) |
+| Channel | `nightly` (app-update.yml) |
 | Boot graph `release` | `{"version":"0.2.2-rc.1","commit":"c59d10a"}` |
-| GUI portu | 61914 (uygulama güncelleme sonrası yeniden başlatıldı) |
+| GUI port | 61914 (the app restarted after the update) |
 
-## 2. Eklenti sağlık kontrolü (canlı)
+## 2. Plugin health check (live)
 
-| Kontrol | Sonuç |
+| Check | Result |
 |---|---|
-| Boot graph'ta `dsh-turkish-locale` satırı | ✓ mevcut; `inject: ["@deepseek-ai/dsh-client-locale"]`, rev `99640a40d87e`, hata işareti yok |
-| Paket bundle'ı `/plugins` üzerinden servis ediliyor | ✓ |
-| Dil seçici | ✓ **9 dil**: 中文, English, 日本語, Español, Français, Deutsch, Русский, Português + **Türkçe** (0.2.2'nin 8 yerleşik dili + bizim paket) |
-| Aktif dil | ✓ `lang=tr`, arayüz Türkçe |
-| Dil değiştirme round-trip (Türkçe → English → Türkçe) | ✓ çalışıyor |
-| Kalıcılık | ✓ `cordis.patch.yml` → `locale.preference: tr` |
-| Plugins → Yüklü | ✓ "Türkçe dil paketi" Türkçe açıklamayla listeleniyor; `Sorun` durumu yok |
-| Çökme/console hatası | Görsel/DOM denetiminde yok (UI tam etkileşimli) |
+| `dsh-turkish-locale` row in the boot graph | ✓ present; `inject: ["@deepseek-ai/dsh-client-locale"]`, rev `99640a40d87e`, no error marker |
+| Bundle served through `/plugins` | ✓ |
+| Language selector | ✓ **9 languages**: 中文, English, 日本語, Español, Français, Deutsch, Русский, Português + **Türkçe** (the 8 built-in 0.2.2 languages plus our pack) |
+| Active language | ✓ `lang=tr`, Turkish UI |
+| Language round-trip (Türkçe → English → Türkçe) | ✓ works |
+| Persistence | ✓ `cordis.patch.yml` → `locale.preference: tr` |
+| Plugins → Installed | ✓ "Türkçe dil paketi" listed with its Turkish description; no `Problem` state |
+| Crash/console error | None in the visual/DOM check (UI fully interactive) |
 
-**Sonuç: güncelleme eklentiyi kırmadı.** Hiçbir kod değişikliği gerekmiyor.
+**Conclusion: the update did not break the plugin.** No code change is required.
 
-## 3. Locale API uyumluluğu (0.2.1-rc.3 → 0.2.2-rc.1)
+## 3. Locale API compatibility (0.2.1-rc.3 → 0.2.2-rc.1)
 
-Kurulu `dsh-client-locale@0.2.2-rc.1` istemci paketi incelendi
-(`contrib/locale-analysis-022rc1/`):
+The installed `dsh-client-locale@0.2.2-rc.1` client package was inspected:
 
-| API | Durum |
+| API | Status |
 |---|---|
-| `addLanguage({id,label,fallback})` | Değişmedi — tek fallback, `en`'de biten zincir |
-| `register(ns, locale, dict)` (per-locale) | Değişmedi — paketimizin kullandığı biçim |
-| `register(ns, {zh,en,...})` (typed) | 0.2.2'de "baseline zh/en zorunlu + ek diller opsiyonel" olarak genişledi; paketimiz etkilenmiyor |
-| `resolveText`, `fallbackChain`, `translate` | Aynı (zincir dil tanımlı; sıralı tercih hâlâ yok) |
-| Snapshot `{active, locales, revision}` | Aynı |
-| `LOCALE_IDS` tabanı | `["zh","en"]` — değişmedi; 8 yerleşik sözlük `apply()` içinde `addLanguage`+`register` ile kaydediliyor |
-| `detectBrowserLocale` | Hâlâ ilk eşleşme (sıralı liste hâlâ öneri durumunda) |
-| `engines.dsh` aralığımız (`>=0.2.1-rc.3 <0.3.0`) | ✓ 0.2.2-rc.1'i kapsıyor |
+| `addLanguage({id,label,fallback})` | Unchanged — single fallback, chain terminates at `en` |
+| `register(ns, locale, dict)` (per-locale) | Unchanged — the form this pack uses |
+| `register(ns, {zh,en,...})` (typed) | Widened in 0.2.2 to "baseline zh/en required + additional languages optional"; our pack is unaffected |
+| `resolveText`, `fallbackChain`, `translate` | Same (the chain is language-defined; ordered preference still absent) |
+| Snapshot `{active, locales, revision}` | Same |
+| `LOCALE_IDS` baseline | `["zh","en"]` — unchanged; the 8 built-in dictionaries are registered inside `apply()` through `addLanguage` + `register` |
+| `detectBrowserLocale` | Still first-match (the ordered list is still a proposal) |
+| Our `engines.dsh` range (`>=0.2.1-rc.3 <0.3.0`) | ✓ covers 0.2.2-rc.1 |
 
-## 4. Kapsam deltası (ölçüldü)
+## 4. Coverage delta (measured)
 
-Sözlükler yeni sürümden yeniden çıkarıldı (`locales/source-0.2.2-rc1.json`,
-`locales/delta-0.2.2-rc1.json`):
+The dictionaries were re-extracted from the new version:
 
-| Metrik | rc.3 | 0.2.2-rc.1 | Delta |
+| Metric | rc.3 | 0.2.2-rc.1 | Delta |
 |---|---|---|---|
-| Ad alanı | 64 | **73** | +10, −1 |
-| İngilizce anahtar | 2.910 | **3.838** | **+981, −52** |
-| Değişen İngilizce değer | — | — | **60** |
-| Türkçe eksik | 0 | — | **981 eksik** |
+| Namespaces | 64 | **73** | +10, −1 |
+| English keys | 2,910 | **3,838** | **+981, −52** |
+| Changed English values | — | — | **60** |
+| Missing Turkish | 0 | — | **981 missing** |
 
-Yeni ad alanları: `forgePanel` 253, `liveshare` 225, `stats` 177,
+New namespaces: `forgePanel` 253, `liveshare` 225, `stats` 177,
 `creationRecommendations` 55, `pluginRecommendations` 25, `actionCards` 14,
-`fileActions` 12, `contextMenu` 1, `fileDrag` 1, `messageQuotes` 1; ayrıca mevcut
-ad alanlarına 217 anahtar eklendi (en büyükler: `pluginManager` +72,
-`schedule.manager` +70). Kaldırılan ad alanı: `deepseek-model-label-1017`.
-`fixtures/version-coverage.json` ölçülen değerlerle güncellendi.
+`fileActions` 12, `contextMenu` 1, `fileDrag` 1, `messageQuotes` 1; another 217
+keys were added to existing namespaces (largest: `pluginManager` +72,
+`schedule.manager` +70). Removed namespace: `deepseek-model-label-1017`.
+`fixtures/version-coverage.json` records the measured values.
 
-**Görsel doğrulama:** güncellenmiş uygulamada yeni 0.2.2 panelleri
-(forge/stats/liveshare vb.) çevrilmemiş olduğundan İngilizce görünecek; çekirdek
-arayüz Türkçe kalıyor. Mevcut çevirilerin 60'ının kaynak metni değişmiş
-(anlam kayması riski düşük ama incelenmeli).
+**Visual check:** on the updated app the new 0.2.2 panels (forge/stats/liveshare,
+etc.) appear in English because they were not translated yet, while the core UI
+stays Turkish. The English source text of 60 existing translations changed (low
+semantic-drift risk, but worth reviewing).
 
-## 5. Hata ayıklama bulguları
+## 5. Debugging findings
 
-1. **Eklentide hata yok.** Çalışma zamanı uyumlu; round-trip ve kalıcılık doğrulandı.
-2. **Çıkarma araç zincirimizde iki gerçek hata bulundu ve düzeltildi** (`tools/extract_dicts.js`):
-   - Yeni büyük paketlerde OOM/çökme (exit 134): tanım araması O(anahtar × dosya)
-     ve dev nesne özyinelemesi → tek geçişli `buildDefs()` indeksi + boyut/şekil
-     filtresi + `trimStart` düzeltmesi (`[` dizileri dahil). Sonuç: **73/3.838/0
-     diagnostics**, ~sn hız.
-3. **Yanıltıcı durum yok:** Plugins sayfasındaki `Güncelleme var` işaretleri Codex/
-   Claude subagent satırlarına ait (uygulamanın kendi kataloğu); paketimize ait değil.
-4. **Paket meta verisi doğru çözülüyor:** "Türkçe dil paketi" satırı `tr` diliyle
-   gösteriliyor (manifest `locale/tr.json`).
+1. **No plugin defect.** The runtime is compatible; round-trip and persistence
+   were verified.
+2. **Two real bugs in our extraction tooling were found and fixed**
+   (`tools/extract_dicts.js`):
+   - OOM/crash (exit 134) on the new, larger bundles: definition lookup was
+     O(key × file) and deep object recursion exploded → a single-pass
+     `buildDefs()` index, a size/shape filter, and a `trimStart` fix (array `[`
+     definitions included). Result: **73/3,838/0 diagnostics** at ~second speed.
+3. **No misleading states:** the `Update available` badges on the Plugins page
+   belong to the Codex/Claude subagent rows (the app's own catalog), not to our
+   pack.
+4. **Pack metadata resolves correctly:** the "Türkçe dil paketi" row is shown
+   with the `tr` language (manifest `locale/tr.json`).
 
-## 6. Öneriler
+## 6. Recommendations
 
-| Öneri | Açıklama |
+| Recommendation | Description |
 |---|---|
-| 981 yeni dizgiyi çevir | Paketi 0.2.2-rc.1 kaynağına göre güncelle (paralel çeviri, 4-5 parça) |
-| 60 değişen `en` değerini gözden geçir | Anlam değişmişse Türkçe çevirileri düzelt |
-| Paketi **1.1.0** olarak yayınla | `engines.dsh` aralığını koru, market indeksine yeni commit'i sabitle |
-| Fixture'ı rc.1 tabanına taşı | `fixtures/version-coverage.json` zaten güncel; `tr-partial` yeni ad alanlarını da kısmi içermeli |
-| Sıralı tercih patch'i | `0002` zaten 0.2.2-alpha.2 tabanlı; rc.1 kaynağı ile bir kez daha karşılaştırılıp gerekirse rebase edilmeli |
+| Translate the 981 new strings | Refresh the pack against the 0.2.2-rc.1 source (parallel translation, 4-5 chunks) |
+| Review the 60 changed `en` values | Update the Turkish where the meaning moved |
+| Release the pack as **1.1.0** | Keep the `engines.dsh` range, pin the new commit in the market index |
+| Move the fixture to the rc.1 base | `fixtures/version-coverage.json` is already up to date; `tr-partial` should also partially cover the new namespaces |
+| Ordered-preference patch | `0002` is alpha.2-based; compare once more against the rc.1 source and rebase if needed |
 
-## 7. Kanıtlar
+## 7. Evidence
 
-- [`screenshots/upgrade-settings.png`](../screenshots/upgrade-settings.png) — Ayarlar, 9 dilli seçici, Türkçe
-- [`screenshots/upgrade-plugins.png`](../screenshots/upgrade-plugins.png) — Yüklü eklentiler, Türkçe paket satırı
-- [`screenshots/roundtrip.png`](../screenshots/roundtrip.png) — dil değiştirme testi
-- [`locales/delta-0.2.2-rc1.json`](../locales/delta-0.2.2-rc1.json) — tam delta (anahtar listeleri dahil)
-- [`locales/source-0.2.2-rc1.json`](../locales/source-0.2.2-rc1.json) — yeni kaynak sözlükler
+- [`docs/settings-tr.png`](settings-tr.png) — Settings, language selector, Turkish
+- [`docs/partial-pack-demo.png`](partial-pack-demo.png) — partial-pack fallback demo
+- Raw extraction artifacts (`source.json`, delta JSON) are produced by the
+  workspace tooling and are not published in this repository; the measured
+  values are recorded in [`fixtures/version-coverage.json`](../fixtures/version-coverage.json).
