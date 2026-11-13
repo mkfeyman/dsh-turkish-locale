@@ -1,48 +1,47 @@
-# dsh-turkish-locale v1.1.1 — 0.2.2-rc.2 kapsamı
+# dsh-turkish-locale v1.1.1 — 0.2.2-rc.2 coverage
 
-**Tarih:** 2026-11-13 · **Hedef:** DSH `0.2.2-rc.2` (commit `a6b1b85`)
+**Date:** 2026-11-13 · **Target:** DSH `0.2.2-rc.2` (commit `a6b1b85`)
 
-## Ne değişti
+## What changed
 
-- **Tam kapsam güncellendi:** 73 → **75 ad alanı**, 3.838 → **4.223 dizgi**;
-  `0.2.2-rc.2` ile eklenen **430 yeni dizgi** Türkçeye çevrildi (%100 kapsam
-  yeniden sağlandı).
-- **2 yeni ad alanı:** `cuaPermissions` (66 — bilgisayar kullanımı izin
-  yönetimi) ve `account.notifications` (1).
-- **Büyüyen ad alanları:** `forgePanel` +174 (değişiklik isteği genel
-  bakışları, branch/commit aralıkları, inceleyici durumları), `settings.models`
-  +37 (Gemini protokolü, yeniden deneme stratejileri), `sidebarFiles` +32
-  (yoksayma dosyaları, arama ipuçları), `settings` +23 ve `settings.webSearch`
-  +23 (kanal etiketleri, faturalama/geçersiz kılma, eski anahtar ipucu),
-  `agent-team` +18, `chat`/`conversation` +12'şer, `liveshare` +9, `subagent` +7,
-  `sidebarTerminal` +5, diğerleri.
-- **Kaldırılan 45 dizgi** paketten temizlendi (ör. `agent-team` −13,
+- **Full coverage refreshed:** 73 → **75 namespaces**, 3,838 → **4,223 strings**;
+  the **430 strings** added in `0.2.2-rc.2` were translated (100 % coverage
+  restored).
+- **2 new namespaces:** `cuaPermissions` (66 — Computer Use permission
+  management) and `account.notifications` (1).
+- **Grown namespaces:** `forgePanel` +174 (change-request overviews,
+  branch/commit ranges, reviewer states), `settings.models` +37 (Gemini
+  protocol, retry strategies), `sidebarFiles` +32 (ignore files, search hints),
+  `settings` +23 and `settings.webSearch` +23 (channel labels, billing/override,
+  legacy-key hint), `agent-team` +18, `chat`/`conversation` +12 each,
+  `liveshare` +9, `subagent` +7, `sidebarTerminal` +5, and more.
+- **45 removed strings** pruned from the pack (e.g. `agent-team` −13,
   `liveshare` −11, `settings.webSearch` −7).
-- **Kaynak metni değişen 2 anahtar düzeltildi** (yer tutucu kayması):
-  `pluginManager.updateStepInstalling` (`{source}`) ve
+- **2 keys whose English source changed** were fixed for placeholder drift:
+  `pluginManager.updateStepInstalling` (`{source}`) and
   `settings.webSearch.baseUrlHint` (`{path}`).
 
-## Uyumluluk
+## Compatibility
 
-- Locale çalışma zamanı API'si değişmedi: `addLanguage`, `register(ns, locale,
-  dict)`, `resolveText`, snapshot ve `locale.preference` sözleşmeleri rc.2'de
-  aynı. `dsh-client-locale@0.2.2-rc.2` etiketi kaynak olarak yalnızca
-  `package.json` (sürüm) farkı taşıyor — sıralı tercih patch taslağı `0003`
-  rc.2 için de geçerli.
-- **Profil kurulumu düzeltildi:** rc.2'de profil `node_modules` pnpm ile
-  yönetiliyor; eski elle kopyalanmış dizin yükleyici tarafından görülmüyordu.
-  Paket artık `plugin_manager install_bundle` üzerinden bağlanıyor
-  (remove_bundle + install_bundle ile yeniden bağlandı) ve boot graph'ta
-  yeniden yerini aldı.
+- The locale runtime API did not change: the `addLanguage`,
+  `register(ns, locale, dict)`, `resolveText`, snapshot, and
+  `locale.preference` contracts are the same in rc.2. The
+  `dsh-client-locale@0.2.2-rc.2` tag differs from rc.1 only in `package.json`
+  (the version), so the ordered-preference patch draft `0003` also applies to
+  rc.2 unchanged.
+- **Profile install fixed:** in rc.2 the profile `node_modules` is pnpm-managed,
+  and the old hand-copied directory was no longer mounted by the Loader. The
+  pack is now linked through `plugin_manager install_bundle` (re-linked with
+  `remove_bundle` + `install_bundle`) and has returned to the boot graph.
 
-## Doğrulama
+## Verification
 
-- 4 paralel çeviri parçası (430/430 kayıt); yer tutucu denetimi temiz.
-- Canlı test (DSH 0.2.2-rc.2): paket boot graph'ta yüklü (`rev 2fe8ccdf`),
-  arayüz `lang=tr`, dil seçici çalışıyor.
-- `engines.dsh` aralığı korundu (`>=0.2.1-rc.3 <0.3.0`).
+- Four parallel translation chunks (430/430 entries); placeholder check clean.
+- Live test (DSH 0.2.2-rc.2): the pack loads from the boot graph (`rev
+  2fe8ccdf`), the UI reports `lang=tr`, and the language selector works.
+- The `engines.dsh` range was kept (`>=0.2.1-rc.3 <0.3.0`).
 
-## Dosyalar
+## Files
 
-- `dsh-turkish-locale-1.1.1.tgz` — npm tarzı paket (`package/` kökü)
-- `SHA256SUMS.txt` — 1.0.0, 1.1.0 ve 1.1.1 özetleri
+- `dsh-turkish-locale-1.1.1.tgz` — npm-style package (`package/` root)
+- `SHA256SUMS.txt` — 1.0.0, 1.1.0 and 1.1.1 digests
