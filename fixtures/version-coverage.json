@@ -8,36 +8,47 @@
     "percent": 59.4
   },
   "installedSource": {
-    "version": "0.2.2-rc.1",
-    "commit": "c59d10a",
-    "namespaces": 73,
-    "keys": 3838,
-    "measuredOn": "2026-11-05",
+    "version": "0.2.2-rc.2",
+    "commit": "a6b1b85",
+    "namespaces": 75,
+    "keys": 4223,
+    "measuredOn": "2026-11-13",
     "addedNamespaces": [
-      {"name": "forgePanel", "keys": 253},
-      {"name": "liveshare", "keys": 225},
-      {"name": "stats", "keys": 177},
-      {"name": "creationRecommendations", "keys": 55},
-      {"name": "pluginRecommendations", "keys": 25},
-      {"name": "actionCards", "keys": 14},
-      {"name": "fileActions", "keys": 12},
-      {"name": "contextMenu", "keys": 1},
-      {"name": "fileDrag", "keys": 1},
-      {"name": "messageQuotes", "keys": 1}
+      {"name": "cuaPermissions", "keys": 66},
+      {"name": "account.notifications", "keys": 1}
     ],
-    "removedNamespaces": ["deepseek-model-label-1017"],
-    "addedKeysInExistingNamespaces": 217,
-    "addedKeysTotal": 981,
-    "removedKeysTotal": 52,
-    "changedEnglishValues": 60,
+    "addedKeysByNamespace": {
+      "forgePanel": 174,
+      "cuaPermissions": 66,
+      "settings.models": 37,
+      "sidebarFiles": 32,
+      "settings": 23,
+      "settings.webSearch": 23,
+      "agent-team": 18,
+      "chat": 12,
+      "conversation": 12,
+      "liveshare": 9,
+      "subagent": 7,
+      "sidebarTerminal": 5,
+      "entryCustomization": 2,
+      "pluginManager": 2,
+      "pluginMarket": 2,
+      "account.notifications": 1,
+      "contextMenu": 1,
+      "open-in-app": 1,
+      "session-log-download": 1,
+      "sidebar": 2
+    },
+    "addedKeysTotal": 430,
+    "removedKeysTotal": 45,
     "coveredByThisFixture": 0,
     "behaviour": "Untranslated entries fall through the ordered preference to English; the fixture demonstrates the lookup/ordering semantics, not full 0.2.2 coverage."
   },
   "pack": {
-    "version": "1.1.0",
-    "released": "2026-11-05",
-    "namespaces": 73,
-    "keys": 3838,
-    "coverage": "100% of the 0.2.2-rc.1 English source"
+    "version": "1.1.1",
+    "released": "2026-11-13",
+    "namespaces": 75,
+    "keys": 4223,
+    "coverage": "100% of the 0.2.2-rc.2 English source"
   }
 }
