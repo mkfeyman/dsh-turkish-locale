@@ -1,36 +1,37 @@
-# dsh-turkish-locale v1.1.0 — 0.2.2-rc.1 kapsamı
+# dsh-turkish-locale v1.1.0 — 0.2.2-rc.1 coverage
 
-**Tarih:** 2026-11-05 · **Hedef:** DSH `0.2.2-rc.1` (commit `c59d10a`)
+**Date:** 2026-11-05 · **Target:** DSH `0.2.2-rc.1` (commit `c59d10a`)
 
-## Ne değişti
+## What changed
 
-- **Tam kapsam güncellendi:** 64 → **73 ad alanı**, 2.910 → **3.838 dizgi**;
-  `0.2.2-rc.1` ile eklenen **981 yeni dizgi** Türkçeye çevrildi (%100 kapsam
-  yeniden sağlandı).
-- **10 yeni ad alanı çevrildi:** `forgePanel` (253), `liveshare` (225),
+- **Full coverage refreshed:** 64 → **73 namespaces**, 2,910 → **3,838 strings**;
+  the **981 strings** added in `0.2.2-rc.1` were translated (100 % coverage
+  restored).
+- **10 new namespaces translated:** `forgePanel` (253), `liveshare` (225),
   `stats` (177), `creationRecommendations` (55), `pluginRecommendations` (25),
   `actionCards` (14), `fileActions` (12), `contextMenu` (1), `fileDrag` (1),
   `messageQuotes` (1).
-- **60 değişen kaynak metin** gözden geçirildi: 40'ının Türkçesi yeni metne göre
-  güncellendi (ör. "hatırlatıcı" → "otomasyon görevi" geçişi, plugin index
-  yeniden adlandırması, model listesi yenileme metinleri), 20'si anlam
-  değişmediği için korundu.
-- **Kaldırılan 52 dizgi ve 1 ad alanı** (`deepseek-model-label-1017`) paketten
-  temizlendi.
-- İki eski etiket düzeltildi: `command/token.feedback` → "Geri bildirim",
+- **60 changed English source values** reviewed: 40 Turkish values were updated
+  to match the new wording (e.g. "reminder" → "automation task", the plugin
+  index rename, model-list refresh copy), 20 were kept because the meaning did
+  not move.
+- **52 removed strings and 1 removed namespace** (`deepseek-model-label-1017`)
+  were pruned from the pack.
+- Two older labels fixed: `command/token.feedback` → "Geri bildirim",
   `command/token.permission` → "İzin".
 
-## Doğrulama
+## Verification
 
-- Yer tutucu denetimi: 3.838/3.838 anahtar kaynakla eşleşiyor, placeholder
-  ihlali yok; İngilizce işlev sözcüğü kalıntısı 0.
-- Canlı test (DSH 0.2.2-rc.1): paket boot graph'ta yükleniyor, dil seçicide
-  8 yerleşik dil + Türkçe, round-trip geçiş ve `locale.preference: tr` kalıcılığı
-  doğrulandı; yeni metinler arayüzde görünüyor (ör. "Model sağlayıcısı ekle").
-- Kurulum/kullanım değişmedi; `engines.dsh` aralığı korundu
+- Placeholder check: 3,838/3,838 keys match the source, no placeholder
+  violations, zero English function-word residue.
+- Live test (DSH 0.2.2-rc.1): the pack loads from the boot graph, the language
+  selector lists the 8 built-in languages plus Türkçe, round-trip switching and
+  `locale.preference: tr` persistence were verified, and the new copy appears in
+  the UI (e.g. "Model sağlayıcısı ekle").
+- Installation and usage are unchanged; the `engines.dsh` range was kept
   (`>=0.2.1-rc.3 <0.3.0`).
 
-## Dosyalar
+## Files
 
-- `dsh-turkish-locale-1.1.0.tgz` — npm tarzı paket (`package/` kökü)
-- `SHA256SUMS.txt` — 1.0.0 ve 1.1.0 özetleri
+- `dsh-turkish-locale-1.1.0.tgz` — npm-style package (`package/` root)
+- `SHA256SUMS.txt` — 1.0.0 and 1.1.0 digests
