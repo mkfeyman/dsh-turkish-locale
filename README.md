@@ -83,6 +83,20 @@ available to pnpm on the machine.
   upgrade analysis stays at
   [`docs/upgrade-analysis-0.2.2-rc1.md`](docs/upgrade-analysis-0.2.2-rc1.md).
 
+## Documentation (English)
+
+All public docs are published in English; Turkish originals are kept alongside
+with a `.tr.md` suffix.
+
+| Document | Purpose |
+|---|---|
+| [`docs/release-notes-v1.1.1.md`](docs/release-notes-v1.1.1.md) | 0.2.2-rc.2 coverage release notes ([Turkish](docs/release-notes-v1.1.1.tr.md)) |
+| [`docs/release-notes-v1.1.0.md`](docs/release-notes-v1.1.0.md) | 0.2.2-rc.1 coverage release notes ([Turkish](docs/release-notes-v1.1.0.tr.md)) |
+| [`docs/upgrade-analysis-0.2.2-rc2.md`](docs/upgrade-analysis-0.2.2-rc2.md) | rc.2 analysis: pnpm-managed profiles, delta, compatibility |
+| [`docs/upgrade-analysis-0.2.2-rc1.md`](docs/upgrade-analysis-0.2.2-rc1.md) | rc.1 analysis: API diff, delta, debugging ([Turkish](docs/upgrade-analysis-0.2.2-rc1.tr.md)) |
+| [`patches/README.md`](patches/README.md) | Ordered-locale-preference patch drafts (#11699) |
+| [`fixtures/README.md`](fixtures/README.md) | Partial-pack fixture and version coverage |
+
 ## Repository layout
 
 | Path | Purpose |
